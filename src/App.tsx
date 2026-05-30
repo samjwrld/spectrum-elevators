@@ -3,324 +3,1738 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useEffect, useState, useRef } from "react";
-import { DoorOverlay } from "./components/DoorOverlay";
-import { FloorIndicator } from "./components/FloorIndicator";
-import { Navigation } from "./components/Navigation";
-import { Lobby, About } from "./components/IntroSections";
-import { Products, Projects } from "./components/ProductSections";
-import { WhyUs, Testimonials, Contact } from "./components/FinalSections";
-import { SECTIONS } from "./types";
-import { motion, useScroll, useSpring, useTransform, useVelocity, AnimatePresence } from "motion/react";
+import React, { useState, useEffect, useRef } from "react";
+import { 
+  Phone, 
+  Mail, 
+  MapPin, 
+  Menu, 
+  X, 
+  Check, 
+  ArrowRight,
+  Shield,
+  ShieldCheck,
+  Clock,
+  ChevronRight,
+  Sparkles,
+  Volume2,
+  Brush,
+  Smartphone,
+  ChevronUp,
+  ChevronDown,
+  Wrench,
+  Award,
+  Users,
+  Building,
+  ArrowUpRight,
+  Layers,
+  Calendar,
+  FileText,
+  UserCheck
+} from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
 
-export default function App() {
-  const [currentFloorIndex, setCurrentFloorIndex] = useState(0);
-  const [isExiting, setIsExiting] = useState(false);
-  const [direction, setDirection] = useState<'up' | 'down' | 'idle'>('idle');
-  const [isScrolling, setIsScrolling] = useState(false);
-  const isManualScrolling = useRef(false);
-  const lastScrollY = useRef(0);
-  const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
+// Generated visual elements for brand elevation
+import luxuryVillaElevator from "./assets/images/luxury_villa_elevator_1780118810684.png";
+import smartElevatorTech from "./assets/images/smart_elevator_tech_1780118834269.png";
+import spectrumLogoImg from "./assets/images/spectrum_logo_1780121476410.png";
 
-  const { scrollYProgress } = useScroll();
-  const scrollVelocity = useVelocity(scrollYProgress);
-  
-  // Simulated Elevator Data
-  const altitude = useTransform(scrollYProgress, [0, 1], [0, 48]); // 48 meters total height (approx 8m per floor)
-  const velocityValue = useTransform(scrollVelocity, (v) => Math.abs(v * 20)); // Adjusted scale for m/s
-  const smoothVelocity = useSpring(velocityValue, { damping: 50, stiffness: 200 });
-  const jitterValue = useTransform(smoothVelocity, [0, 2], [0, 1.5]); // Jitter intensity in pixels
-  const smoothJitter = useSpring(jitterValue, { damping: 10, stiffness: 500 });
 
-  const blurValue = useTransform(scrollVelocity, [-0.05, 0, 0.05], [5, 0, 5]);
-  const smoothBlur = useSpring(blurValue, { damping: 50, stiffness: 300 });
-  const blurFilter = useTransform(smoothBlur, (v) => `blur(${v}px)`);
-  const backgroundScale = useTransform(scrollYProgress, [0, 1], [1, 1.15]);
-
-  const scaleX = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
-    restDelta: 0.001
-  });
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      
-      if (currentScrollY > lastScrollY.current) {
-        setDirection('down');
-      } else if (currentScrollY < lastScrollY.current) {
-        setDirection('up');
-      }
-      
-      setIsScrolling(true);
-      lastScrollY.current = currentScrollY;
-
-      if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
-      scrollTimeout.current = setTimeout(() => {
-        setIsScrolling(false);
-        setDirection('idle');
-        isManualScrolling.current = false;
-      }, 150);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
-    };
-  }, []);
-
-  useEffect(() => {
-    const observerOptions = {
-      root: null,
-      rootMargin: "-45% 0% -45% 0%",
-      threshold: 0,
-    };
-
-    const handleIntersect = (entries: IntersectionObserverEntry[]) => {
-      if (isManualScrolling.current) return;
-
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const index = SECTIONS.findIndex((s) => s.id === entry.target.id);
-          if (index !== -1) {
-            setCurrentFloorIndex(index);
-          }
-        }
-      });
-    };
-
-    const observer = new IntersectionObserver(handleIntersect, observerOptions);
-
-    SECTIONS.forEach((section) => {
-      const el = document.getElementById(section.id);
-      if (el) observer.observe(el);
-    });
-
-    return () => observer.disconnect();
-  }, []);
-
-  const [floorHistory, setFloorHistory] = useState<string[]>([]);
-  const [isCabinView, setIsCabinView] = useState(false);
-
-  useEffect(() => {
-    const currentFloor = SECTIONS[currentFloorIndex].floor;
-    setFloorHistory(prev => {
-      if (prev[0] === currentFloor) return prev;
-      return [currentFloor, ...prev].slice(0, 3);
-    });
-  }, [currentFloorIndex]);
-
-  // Simple flicker effect handler
-  const [flicker, setFlicker] = useState(false);
-  useEffect(() => {
-    setFlicker(true);
-    const timer = setTimeout(() => setFlicker(false), 500);
-    return () => clearTimeout(timer);
-  }, [currentFloorIndex]);
+// Reusable high-fidelity matching brand logo component
+export function SpectrumLogo({ className = "", size = "normal" }: { className?: string; size?: "normal" | "small" | "large" }) {
+  const heightClasses = {
+    small: "h-9 sm:h-10",
+    normal: "h-11 sm:h-12",
+    large: "h-16 sm:h-20",
+  };
 
   return (
-    <div className="relative min-h-screen bg-black">
-      {/* Elevator Interior Environment (Flicker affects these) */}
-      <div className={flicker ? 'animate-floor-flicker' : ''}>
-        {/* Background Elevator Shaft Video */}
-        <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-          <motion.div 
-            style={{ scale: backgroundScale }}
-            className="w-full h-full"
-          >
-            <video 
-              autoPlay 
-              muted 
-              loop 
-              playsInline
-              className="w-full h-full object-cover opacity-20 grayscale brightness-50"
-            >
-              <source src="https://assets.mixkit.co/videos/preview/mixkit-moving-up-an-elevator-shaft-34988-large.mp4" type="video/mp4" />
-            </video>
-          </motion.div>
-          
-          {/* Cinematic Motion Blur Overlay */}
-          <motion.div 
-            style={{ backdropFilter: blurFilter }}
-            className="absolute inset-0 z-10"
-          />
-          
-          {/* Vignette & Depth Shadow */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)] z-20" />
-        </div>
-
-        {/* Hero & Sections with mechanical vibration during scroll */}
-        <main className={`relative z-20 ${isScrolling ? 'animate-rumble' : ''}`}>
-          <Lobby />
-          <About />
-          <Products />
-          <Projects />
-          <WhyUs />
-          <Testimonials />
-          <Contact />
-        </main>
-        
-        {/* Footer / Penthouse Exit Concept */}
-        <footer className="py-24 bg-steel-900 border-t border-steel-800 text-center relative overflow-hidden z-10">
-          <div className="absolute inset-0 opacity-10 brushed-metal-dark" />
-          <div className="container mx-auto px-6 relative z-10">
-            <div className="w-16 h-16 rounded border-2 border-gold flex items-center justify-center bg-steel-800 mx-auto mb-8 shadow-2xl">
-              <span className="text-gold font-sans font-bold text-2xl">S</span>
-            </div>
-            <h3 className="text-2xl font-display text-gold mb-4 uppercase tracking-[0.4em]">Vertical Precision</h3>
-            <p className="text-warm-white/40 font-mono text-xs tracking-widest uppercase max-w-md mx-auto leading-relaxed">
-              Spectrum Elevators GmbH // Industrial Estate Phase II, Skyline Business Park, Munich, Germany
-            </p>
-            <div className="mt-12 pt-12 border-t border-steel-800 flex flex-col md:flex-row justify-between items-center gap-6">
-               <p className="text-[10px] font-mono text-warm-white/20 uppercase">© 2026 ARCHITECTURAL VERTICAL SOLUTIONS</p>
-               <div className="flex gap-8 text-[10px] font-mono uppercase tracking-widest text-warm-white/40">
-                  <a href="#" className="hover:text-gold transition-colors">Privacy</a>
-                  <a href="#" className="hover:text-gold transition-colors">Safety</a>
-                  <a href="#" className="hover:text-gold transition-colors">Support</a>
-               </div>
-            </div>
-          </div>
-        </footer>
-      </div>
-
-      {/* STABLE UI LAYER (Outside flicker to preserve fixed positioning) */}
-      
-      {/* Screen/HUD Effects */}
-      <div className="fixed inset-0 pointer-events-none z-[5000] overflow-hidden opacity-[0.03]">
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_4px,3px_100%]" />
-      </div>
-      <div className="fixed inset-0 pointer-events-none noise-overlay z-[50]" />
-      
-      <DoorOverlay isClosing={isExiting} />
-      
-      {/* Cabin Interior Graphical Overlay */}
-      <AnimatePresence>
-        {isCabinView && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[120] pointer-events-none overflow-hidden"
-          >
-            {/* Structural Walls */}
-            <div className="absolute inset-y-0 left-0 w-[15%] bg-steel-900 shadow-[20px_0_100px_rgba(0,0,0,0.9)] border-r border-steel-800 brushed-metal-dark" />
-            <div className="absolute inset-y-0 right-0 w-[15%] bg-steel-900 shadow-[-20px_0_100px_rgba(0,0,0,0.9)] border-l border-steel-800 brushed-metal-dark" />
-            
-            {/* Ceiling & Floor Paneling */}
-            <div className="absolute top-0 inset-x-0 h-[10%] bg-steel-900 border-b border-steel-800 brushed-metal-dark shadow-[0_20px_100px_rgba(0,0,0,0.9)]" />
-            <div className="absolute bottom-0 inset-x-0 h-[10%] bg-steel-900 border-t border-steel-800 brushed-metal-dark shadow-[0_-20px_100px_rgba(0,0,0,0.9)]" />
-            
-            {/* Corner Pillars */}
-            <div className="absolute top-0 left-0 w-32 h-32 bg-steel-800 rounded-br-[100px] border-r border-b border-steel-700 shadow-2xl opacity-50" />
-            <div className="absolute top-0 right-0 w-32 h-32 bg-steel-800 rounded-bl-[100px] border-l border-b border-steel-700 shadow-2xl opacity-50" />
-            
-            {/* Center Focus Shadow */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_40%,rgba(0,0,0,0.8)_100%)]" />
-            
-            {/* Cabin View Tag */}
-            <div className="absolute top-24 left-1/2 -translate-x-1/2 flex items-center gap-4 bg-steel-900/80 border border-steel-700 px-6 py-2 rounded-full backdrop-blur-xl">
-               <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse shadow-[0_0_10px_red]" />
-               <span className="text-[10px] font-mono text-warm-white font-bold tracking-[0.4em] uppercase whitespace-nowrap">Cabin Interior HUD // Active</span>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Architectural Frame (Transparent center) */}
-      <motion.div 
-        style={{ x: useTransform(smoothJitter, [0, 2], [0, 1]), y: useTransform(smoothJitter, [0, 2], [0, 1]) }}
-        animate={{ opacity: isCabinView ? 0 : 1 }}
-        className="fixed inset-0 pointer-events-none z-[100] overflow-hidden"
-      >
-        <div className="absolute top-0 inset-x-0 h-6 bg-steel-800 brushed-metal border-b border-steel-700 shadow-md">
-           <div className="absolute top-2 left-4 rivet" />
-           <div className="absolute top-2 right-4 rivet" />
-           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-12 bg-steel-900 border-b-2 border-x-2 border-steel-700 rounded-b-xl flex items-center justify-center gap-4 px-4 overflow-hidden z-[85]">
-              <div className="flex gap-1">
-                 <div className={`w-1.5 h-1.5 rounded-full ${direction === 'up' ? 'bg-gold shadow-[0_0_5px_#C9A84C]' : 'bg-steel-800'}`} />
-                 <div className={`w-1.5 h-1.5 rounded-full ${direction === 'down' ? 'bg-gold shadow-[0_0_5px_#C9A84C]' : 'bg-steel-800'}`} />
-              </div>
-              <span className="text-gold font-sans font-bold text-lg tracking-widest uppercase truncate max-w-[150px] drop-shadow-md">
-                {SECTIONS[currentFloorIndex].label}
-              </span>
-           </div>
-        </div>
-        <div className="absolute bottom-0 inset-x-0 h-6 bg-steel-800 brushed-metal border-t border-steel-700 shadow-md">
-           <div className="absolute bottom-2 left-4 rivet" />
-           <div className="absolute bottom-2 right-4 rivet" />
-        </div>
-        <div className="absolute inset-y-0 left-0 w-6 bg-steel-800 brushed-metal border-r border-steel-700">
-           {/* Left Shaft Light Strip */}
-           <motion.div 
-             className="absolute right-1 top-0 bottom-0 w-[2px] bg-gold/20 origin-top"
-             style={{ scaleY: scrollYProgress }}
-           />
-           <motion.div 
-             className="absolute right-1 top-0 bottom-0 w-[2px] bg-gold origin-top blur-[3px] shadow-[0_0_15px_#C9A84C]"
-             style={{ scaleY: scrollYProgress }}
-           />
-        </div>
-        <div className="absolute inset-y-0 right-0 w-6 bg-steel-800 brushed-metal border-l border-steel-700">
-           {/* Right Shaft Light Strip */}
-           <motion.div 
-             className="absolute left-1 top-0 bottom-0 w-[2px] bg-gold/20 origin-top"
-             style={{ scaleY: scrollYProgress }}
-           />
-           <motion.div 
-             className="absolute left-1 top-0 bottom-0 w-[2px] bg-gold origin-top blur-[3px] shadow-[0_0_15px_#C9A84C]"
-             style={{ scaleY: scrollYProgress }}
-           />
-        </div>
-        <div className="absolute inset-6 shadow-[inset_0_0_50px_rgba(0,0,0,0.8)] opacity-50" />
-      </motion.div>
-
-      {/* UI Elements */}
-      <Navigation 
-        currentFloorIndex={currentFloorIndex} 
-        isCabinView={isCabinView} 
-        setIsCabinView={setIsCabinView} 
-        onManualScroll={() => {
-          isManualScrolling.current = true;
-          setTimeout(() => { if (!isScrolling) isManualScrolling.current = false; }, 1000);
-        }}
+    <div className={`flex items-center ${className}`}>
+      <img
+        src={spectrumLogoImg}
+        alt="Spectrum Elevators Logo"
+        referrerPolicy="no-referrer"
+        className={`${heightClasses[size]} w-auto object-contain`}
       />
-      <FloorIndicator 
-        currentFloorIndex={currentFloorIndex} 
-        direction={direction} 
-        history={floorHistory.slice(1)} 
-        altitude={altitude}
-        velocity={smoothVelocity}
-        jitter={smoothJitter}
-        isCabinView={isCabinView}
-        onManualScroll={() => {
-          isManualScrolling.current = true;
-          setTimeout(() => { if (!isScrolling) isManualScrolling.current = false; }, 1000);
-        }}
-      />
-      
-      {/* Progress Bar (Hidden top of navigation) */}
-      <motion.div
-        className="fixed top-20 left-0 right-0 h-0.5 bg-gold origin-left z-[510] transform-gpu translate-z-0"
-        style={{ scaleX }}
-      />
-
-
-      {/* Exit Trigger Background (Optional visual) */}
-      <div className="fixed bottom-10 right-10 z-50">
-         <button 
-           onClick={() => {
-              setIsExiting(true);
-              setTimeout(() => setIsExiting(false), 2000);
-           }}
-           className="w-12 h-12 rounded-full border border-gold/20 bg-steel-900/50 backdrop-blur flex items-center justify-center text-gold hover:bg-gold hover:text-steel-900 transition-all opacity-20 hover:opacity-100"
-           title="Test Door Close"
-         >
-           <div className="w-4 h-4 border-2 border-current rounded-sm" />
-         </button>
-      </div>
     </div>
   );
 }
 
+
+export default function App() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [formSubmitted, setFormSubmitted] = useState(false);
+  const [showSafetyDetails, setShowSafetyDetails] = useState(false);
+  
+  // Interactive Elevator State
+  const [currentFloor, setCurrentFloor] = useState("6");
+  const [targetFloor, setTargetFloor] = useState("6");
+  const [doorState, setDoorState] = useState<"open" | "closed" | "opening" | "closing">("open");
+  const [isMoving, setIsMoving] = useState(false);
+  const [movingDirection, setMovingDirection] = useState<"up" | "down" | null>(null);
+  const [simulatedPath, setSimulatedPath] = useState<string[]>([]);
+  const [displayFloor, setDisplayFloor] = useState("6");
+  const [activeProductIndex, setActiveProductIndex] = useState(0);
+
+  
+  // Form states
+  const [formData, setFormData] = useState({
+    name: "",
+    phone: "",
+    service: "New Lift Installations",
+    message: ""
+  });
+  
+  const floors = ["6", "5", "4", "3", "2", "1", "G", "B1"];
+
+  // Unique interior descriptions based on the selected floor
+  const floorInteriors: Record<string, { title: string; style: string; gradient: string }> = {
+    "6": { 
+      title: "Penthouse Gold Crystal Lounge", 
+      style: "High-end warm gold brass panels with crystal ambient backlights", 
+      gradient: "from-[#F1E5D1] via-[#E2C799] to-[#C9A05C]" 
+    },
+    "5": { 
+      title: "Deluxe Corporate Mirror panels", 
+      style: "Brushed champagne stainless steel with seamless infinity mirrors", 
+      gradient: "from-[#E6E8EA] via-[#D1D5DB] to-[#B1B5BC]" 
+    },
+    "4": { 
+      title: "Modern Botanical Atrium View", 
+      style: "Biophilic moss wall highlights with warm natural LED strips", 
+      gradient: "from-[#E8F5E9] via-[#C8E6C9] to-[#A5D6A7]" 
+    },
+    "3": { 
+      title: "Abstract Premium Art Gallery", 
+      style: "Sleek textured obsidian cladding with warm spotlight highlights", 
+      gradient: "from-[#2A2B3D] via-[#1D1E2C] to-[#0A0B10]" 
+    },
+    "2": { 
+      title: "Fine-Grained Warm Teak Wood Core", 
+      style: "Handcrafted marine-grade teak timber strips with gold linings", 
+      gradient: "from-[#DCBC9D] via-[#C69C72] to-[#B18556]" 
+    },
+    "1": { 
+      title: "Minimalist High-Contrast Silver Steel", 
+      style: "Brushed matte chrome panels with surgical high-intensity cleanrooms", 
+      gradient: "from-[#E4F1F5] via-[#CADEE6] to-[#B0CEDB]" 
+    },
+    "G": { 
+      title: "Grand Marble Imperial Entrance Logo", 
+      style: "Italian white Carrara marble with gold-veined accents", 
+      gradient: "from-[#FFFFFF] via-[#F4F4F6] to-[#E9EAED]" 
+    },
+    "B1": { 
+      title: "Secure Intelligent Indigo Lounge Zone", 
+      style: "Sleek carbon fiber paneling with neon dynamic guide light indicators", 
+      gradient: "from-[#1A237E] via-[#0D47A1] to-[#01579B]" 
+    }
+  };
+
+  // Sound chime chime (web audio API)
+  const playArrivalChime = () => {
+    try {
+      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      
+      // High note
+      const osc1 = audioCtx.createOscillator();
+      const gain1 = audioCtx.createGain();
+      osc1.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
+      osc1.type = "sine";
+      gain1.gain.setValueAtTime(0.12, audioCtx.currentTime);
+      gain1.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.2);
+      osc1.connect(gain1);
+      gain1.connect(audioCtx.destination);
+      osc1.start();
+      osc1.stop(audioCtx.currentTime + 1.2);
+
+      // Harmonizing higher note half a beat later
+      setTimeout(() => {
+        const osc2 = audioCtx.createOscillator();
+        const gain2 = audioCtx.createGain();
+        osc2.frequency.setValueAtTime(880.00, audioCtx.currentTime); // A5
+        osc2.type = "sine";
+        gain2.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gain2.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.2);
+        osc2.connect(gain2);
+        gain2.connect(audioCtx.destination);
+        osc2.start();
+        osc2.stop(audioCtx.currentTime + 1.2);
+      }, 150);
+
+    } catch (e) {
+      console.log("Audio chiming not supported or blocked by browser gesture permissions.");
+    }
+  };
+
+  // Trigger elevator motion
+  const handleElevatorCall = (floor: string) => {
+    if (floor === currentFloor || isMoving) return;
+    
+    setTargetFloor(floor);
+    setIsMoving(true);
+    
+    // Determine path
+    const currentIndex = floors.indexOf(currentFloor);
+    const targetIndex = floors.indexOf(floor);
+    const isGoingUp = currentIndex > targetIndex; // inverse array order
+    setMovingDirection(isGoingUp ? "up" : "down");
+    
+    // Generate middle path steps
+    const stepPath: string[] = [];
+    if (isGoingUp) {
+      for (let i = currentIndex - 1; i >= targetIndex; i--) {
+        stepPath.push(floors[i]);
+      }
+    } else {
+      for (let i = currentIndex + 1; i <= targetIndex; i++) {
+        stepPath.push(floors[i]);
+      }
+    }
+    setSimulatedPath(stepPath);
+
+    // Initial sequence: close door first
+    setDoorState("closing");
+    
+    // Once closed, begin movement ticks
+    setTimeout(() => {
+      setDoorState("closed");
+    }, 1000);
+  };
+
+  // Simulate Floor motion step by step
+  useEffect(() => {
+    if (isMoving && doorState === "closed" && simulatedPath.length > 0) {
+      const nextStepTimeout = setTimeout(() => {
+        const nextFloor = simulatedPath[0];
+        setDisplayFloor(nextFloor);
+        setSimulatedPath((prev) => prev.slice(1));
+        
+        if (simulatedPath.length === 1) {
+          // Reached target
+          setTimeout(() => {
+            setCurrentFloor(nextFloor);
+            setIsMoving(false);
+            setMovingDirection(null);
+            playArrivalChime();
+            setDoorState("opening");
+            
+            setTimeout(() => {
+              setDoorState("open");
+            }, 1000);
+          }, 800);
+        }
+      }, 1000);
+
+      return () => clearTimeout(nextStepTimeout);
+    }
+  }, [isMoving, doorState, simulatedPath, currentFloor]);
+
+  // Intersection Observer scroll reveal
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: "0px 0px -50px 0px" }
+    );
+
+    const revealElements = document.querySelectorAll(".reveal");
+    revealElements.forEach((el) => observer.observe(el));
+
+    return () => {
+      revealElements.forEach((el) => observer.unobserve(el));
+    };
+  }, []);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (formData.name.trim() && formData.phone.trim()) {
+      setFormSubmitted(true);
+      setTimeout(() => {
+        setFormSubmitted(false);
+        setFormData({
+          name: "",
+          phone: "",
+          service: "New Lift Installations",
+          message: ""
+        });
+      }, 6000);
+    }
+  };
+
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      const offset = 90;
+      const elementPosition = element.getBoundingClientRect().top + window.scrollY;
+      const offsetPosition = elementPosition - offset;
+      
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth"
+      });
+      setMobileMenuOpen(false);
+    }
+  };
+
+  const services = [
+    {
+      num: "01",
+      title: "New Lift Installations",
+      desc: "Custom design and installation for residential to commercial projects, fully compliant with safety regulations."
+    },
+    {
+      num: "02",
+      title: "In-House Controller Technology",
+      desc: "Proprietary control systems with precise control, faster response, and seamless integration."
+    },
+    {
+      num: "03",
+      title: "Modernization & Upgrades",
+      desc: "Latest technology upgrades improving energy efficiency, user experience, and property value."
+    },
+    {
+      num: "04",
+      title: "Repair & Maintenance",
+      desc: "Certified technicians for regular inspections, troubleshooting, and prompt repairs that minimize downtime."
+    },
+    {
+      num: "05",
+      title: "Control Modification",
+      desc: "Upgrade outdated control systems to improve efficiency and reduce wait times in any environment."
+    },
+    {
+      num: "06",
+      title: "24/7 Emergency Support",
+      desc: "Our dedicated team is always on call — rapid response prioritising passenger safety."
+    }
+  ];
+
+  const elevatorTypes = [
+    {
+      num: "01",
+      name: "Home Elevators",
+      desc: "Designed for multi-story homes, blending seamlessly with your interior design while enhancing mobility."
+    },
+    {
+      num: "02",
+      name: "Passenger Elevators",
+      desc: "Safe, comfortable transportation with advanced technology and customizable options for any building."
+    },
+    {
+      num: "03",
+      name: "Commercial Elevators",
+      desc: "High-traffic solutions for offices and retail — quick, efficient, and built for daily intensity."
+    },
+    {
+      num: "04",
+      name: "Industrial Elevators",
+      desc: "Heavy-load capability for warehouses and manufacturing, engineered for the most demanding conditions."
+    },
+    {
+      num: "05",
+      name: "Freight Elevators",
+      desc: "Robust and reliable goods transport for commercial and industrial use — smooth, efficient, built to last."
+    }
+  ];
+
+  const testimonials = [
+    {
+      text: "Spectrum Elevators provided exceptional service during our recent installation. Their team was professional, efficient, and attentive to every detail.",
+      author: "RAVI KUMAR",
+      location: "Hyderabad"
+    },
+    {
+      text: "The maintenance service has been outstanding. Their technicians are knowledgeable and always ensure our elevators are in top condition.",
+      author: "SWATHI RANI",
+      location: "Mumbai"
+    },
+    {
+      text: "We upgraded our elevator controls with Spectrum and the difference is remarkable — faster, more reliable. Truly expert work.",
+      author: "MADHAV REDDY",
+      location: "Nanded"
+    }
+  ];
+
+  const marqueeText = "New Installations · Controller Technology · 24/7 Emergency Support · Modernization & Upgrades · Certified Technicians · Hyderabad · Mumbai · Nanded · ";
+
+  return (
+    <div className="min-h-screen bg-white text-[#151922] relative selection:bg-[#73BA27] selection:text-white">
+      
+      {/* SECTION 1 — NAVBAR */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-[10px] border-b border-gray-100 shadow-sm transition-all duration-300">
+        <div className="max-w-7xl mx-auto px-6 md:px-12 h-24 flex items-center justify-between">
+          
+          {/* Logo matched precisely to original image */}
+          <div 
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} 
+            className="cursor-pointer select-none"
+          >
+            <SpectrumLogo size="normal" />
+          </div>
+
+          {/* Desktop Navigation Links */}
+          <nav className="hidden lg:flex items-center space-x-8">
+            <button 
+              onClick={() => scrollToSection("hero")} 
+              className="font-jost text-[0.82rem] font-semibold uppercase tracking-[0.15em] text-[#73BA27] border-b-2 border-[#73BA27] pb-1.5 transition-all"
+            >
+              Home
+            </button>
+            <button 
+              onClick={() => scrollToSection("about")} 
+              className="font-jost text-[0.82rem] font-medium uppercase tracking-[0.15em] text-gray-400 hover:text-[#73BA27] transition-colors duration-300"
+            >
+              About Us
+            </button>
+            <button 
+              onClick={() => scrollToSection("products")} 
+              className="font-jost text-[0.82rem] font-medium uppercase tracking-[0.15em] text-gray-400 hover:text-[#73BA27] transition-colors duration-300"
+            >
+              Products
+            </button>
+            <button 
+              onClick={() => scrollToSection("services")} 
+              className="font-jost text-[0.82rem] font-medium uppercase tracking-[0.15em] text-gray-400 hover:text-[#73BA27] transition-colors duration-300"
+            >
+              Services
+            </button>
+            <button 
+              onClick={() => scrollToSection("testimonials")} 
+              className="font-jost text-[0.82rem] font-medium uppercase tracking-[0.15em] text-gray-400 hover:text-[#73BA27] transition-colors duration-300"
+            >
+              Projects
+            </button>
+            <button 
+              onClick={() => scrollToSection("contact")} 
+              className="font-jost text-[0.82rem] font-medium uppercase tracking-[0.15em] text-gray-400 hover:text-[#73BA27] transition-colors duration-300"
+            >
+              Contact Us
+            </button>
+          </nav>
+
+          {/* Desktop Phone Capsule Pill Button */}
+          <div className="hidden lg:block">
+            <a 
+              href="tel:+918919102440"
+              className="flex items-center space-x-3 border-[1.5px] border-[#73BA27]/60 hover:border-[#73BA27] px-6 py-3 rounded-full bg-[#73BA27]/5 hover:bg-[#73BA27]/10 text-gray-900 transition-all duration-300 shadow-sm"
+            >
+              <div className="w-6 h-6 rounded-full bg-[#73BA27] flex items-center justify-center text-white">
+                <Phone className="w-3.5 h-3.5 fill-white text-white" />
+              </div>
+              <span className="font-jost text-[0.85rem] font-bold tracking-wider text-gray-900">
+                +91 891 910 2440
+              </span>
+            </a>
+          </div>
+
+          {/* Mobile Hamburguer Menu */}
+          <button 
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)} 
+            className="lg:hidden text-gray-900 hover:text-[#73BA27] transition-colors p-1"
+          >
+            {mobileMenuOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
+          </button>
+        </div>
+
+        {/* Mobile Navigation Drawer */}
+        {mobileMenuOpen && (
+          <div className="lg:hidden bg-white border-b border-gray-100 px-6 py-8 absolute top-[96px] left-0 right-0 z-40 flex flex-col space-y-4 shadow-xl animate-fadeIn">
+            <button 
+              onClick={() => { scrollToSection("hero"); }} 
+              className="text-left font-jost text-[0.95rem] font-semibold uppercase tracking-[0.1em] text-[#73BA27]"
+            >
+              Home
+            </button>
+            <button 
+              onClick={() => scrollToSection("about")} 
+              className="text-left font-jost text-[0.95rem] font-medium uppercase tracking-[0.1em] text-gray-500 hover:text-[#73BA27] py-1"
+            >
+              About Us
+            </button>
+            <button 
+              onClick={() => scrollToSection("products")} 
+              className="text-left font-jost text-[0.95rem] font-medium uppercase tracking-[0.1em] text-gray-500 hover:text-[#73BA27] py-1"
+            >
+              Products
+            </button>
+            <button 
+              onClick={() => scrollToSection("services")} 
+              className="text-left font-jost text-[0.95rem] font-medium uppercase tracking-[0.1em] text-gray-500 hover:text-[#73BA27] py-1"
+            >
+              Services
+            </button>
+            <button 
+              onClick={() => scrollToSection("testimonials")} 
+              className="text-left font-jost text-[0.95rem] font-medium uppercase tracking-[0.1em] text-gray-500 hover:text-[#73BA27] py-1"
+            >
+              Projects
+            </button>
+            <button 
+              onClick={() => scrollToSection("contact")} 
+              className="text-left font-jost text-[0.95rem] font-medium uppercase tracking-[0.1em] text-gray-500 hover:text-[#73BA27] py-1"
+            >
+              Contact Us
+            </button>
+            
+            <a 
+              href="tel:+918919102440"
+              className="flex items-center justify-center space-x-3 border border-[#73BA27] py-3.5 rounded-full bg-[#73BA27]/5 text-gray-900 mt-4 font-jost font-bold"
+            >
+              <Phone className="w-4 h-4 text-[#73BA27] fill-[#73BA27]" />
+              <span>Call Us: +91 891 910 2440</span>
+            </a>
+          </div>
+        )}
+      </header>
+
+
+      {/* SECTION 2 — HERO */}
+      <section id="hero" className="pt-24 min-h-screen pb-16 md:pb-28 bg-gradient-to-br from-white via-[#FAF9F7] to-[#F1F3EE] relative overflow-hidden flex flex-col justify-between">
+        
+        {/* Architectural drafting grid pattern and subtle ambient gradient glows */}
+        <div className="absolute inset-0 bg-grid-pattern opacity-50 pointer-events-none" />
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#73BA27]/8 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute bottom-1/3 right-1/4 w-[400px] h-[400px] bg-[#0172CE]/6 rounded-full blur-[120px] pointer-events-none" />
+        
+        {/* Background graphic curve masks similar to the luxury wave in the image */}
+        <div className="absolute top-0 right-0 w-[55%] h-full bg-[#F5F5FA] rounded-l-[100px] md:rounded-l-[250px] overflow-hidden -z-0 hidden md:block border-l border-white/20 shadow-[inset_10px_0_30px_rgba(0,0,0,0.01)]" />
+
+        
+        <div className="max-w-7xl mx-auto px-6 md:px-12 py-12 md:py-16 w-full grid grid-cols-1 md:grid-cols-12 gap-12 items-center relative z-10 flex-grow">
+          
+          {/* Left Column Content */}
+          <div className="w-full md:col-span-7 flex flex-col justify-center">
+            
+            {/* Small headline label with a light-green row accent */}
+            <div className="flex items-center space-x-3 mb-6">
+              <span className="w-12 h-[2px] bg-[#73BA27] block"></span>
+              <span className="font-jost text-xs md:text-sm text-gray-800 font-bold tracking-[0.12em] uppercase">
+                Smart Elevators. Smarter Living.
+              </span>
+            </div>
+
+            {/* Stunning premium heading from the reference image */}
+            <h1 className="font-jost leading-[1.125] text-[2.35rem] sm:text-[3.2rem] lg:text-[4.2rem] font-semibold text-gray-900 tracking-tight mb-6">
+              <div>Elevate Life with</div>
+              <div className="text-[#73BA27] underline decoration-gray-100 underline-offset-4">Safety, Style &</div>
+              <div className="text-[#0172CE]">Superior Technology</div>
+            </h1>
+
+            {/* Paragraph body text matching the image */}
+            <p className="font-jost text-[0.95rem] md:text-[1.05rem] font-normal text-gray-500 max-w-[540px] leading-[1.8] mb-10">
+              Premium elevator solutions for homes, commercial spaces and real estate projects. Built for safety. Designed for comfort. Made to last.
+            </p>
+
+            {/* 4 horizontal micro highlight columns layout with beautiful status icons */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+              
+              <div className="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-gray-100 flex flex-col items-center text-center shadow-[0_4px_12px_rgba(0,0,0,0.02)] hover:scale-105 transition-all">
+                <div className="w-10 h-10 rounded-full bg-[#73BA27]/10 flex items-center justify-center text-[#73BA27] mb-2">
+                  <Shield className="w-5 h-5" />
+                </div>
+                <span className="font-jost text-xs font-bold text-gray-800 tracking-wide uppercase">Advanced Safety</span>
+              </div>
+
+              <div className="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-gray-100 flex flex-col items-center text-center shadow-[0_4px_12px_rgba(0,0,0,0.02)] hover:scale-105 transition-all">
+                <div className="w-10 h-10 rounded-full bg-[#0172CE]/10 flex items-center justify-center text-[#0172CE] mb-2">
+                  <Volume2 className="w-5 h-5" />
+                </div>
+                <span className="font-jost text-xs font-bold text-gray-800 tracking-wide uppercase">Smooth & Silent</span>
+              </div>
+
+              <div className="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-gray-100 flex flex-col items-center text-center shadow-[0_4px_12px_rgba(0,0,0,0.02)] hover:scale-105 transition-all">
+                <div className="w-10 h-10 rounded-full bg-[#73BA27]/10 flex items-center justify-center text-[#73BA27] mb-2">
+                  <Brush className="w-5 h-5" />
+                </div>
+                <span className="font-jost text-xs font-bold text-gray-800 tracking-wide uppercase">Luxury Designs</span>
+              </div>
+
+              <div className="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-gray-100 flex flex-col items-center text-center shadow-[0_4px_12px_rgba(0,0,0,0.02)] hover:scale-105 transition-all">
+                <div className="w-10 h-10 rounded-full bg-[#0172CE]/10 flex items-center justify-center text-[#0172CE] mb-2">
+                  <UserCheck className="w-5 h-5" />
+                </div>
+                <span className="font-jost text-xs font-bold text-gray-800 tracking-wide uppercase">Reliable Support</span>
+              </div>
+
+            </div>
+
+            {/* Dynamic Actions block */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <button 
+                onClick={() => scrollToSection("contact")}
+                className="bg-[#73BA27] hover:bg-[#62a31f] text-white px-8 py-4 px-9 rounded-full font-jost text-[0.88rem] uppercase font-bold tracking-[0.1em] hover:shadow-lg transition-all duration-300 cursor-pointer flex items-center justify-center space-x-2.5 shadow-md"
+              >
+                <Calendar className="w-4 h-4" />
+                <span>Book Free Consultation</span>
+              </button>
+              
+              <button 
+                onClick={() => scrollToSection("contact")}
+                className="bg-white hover:bg-gray-50 text-gray-800 border border-gray-200 hover:border-gray-300 px-8 py-4 px-9 rounded-full font-jost text-[0.88rem] uppercase font-bold tracking-[0.1em] hover:shadow-md transition-all duration-300 cursor-pointer flex items-center justify-center space-x-2.5 shadow-sm"
+              >
+                <FileText className="w-4 h-4 text-[#0172CE]" />
+                <span>Get a Free Estimate</span>
+              </button>
+            </div>
+
+          </div>
+
+          {/* Right Column with our State-Of-The-Art Interactive Elevator Lobby Simulator */}
+          <div className="w-full md:col-span-5 flex flex-col items-center justify-center relative min-h-[460px]">
+            
+            {/* Simulation Header */}
+            <div className="absolute top-0 bg-white/90 backdrop-blur-sm shadow-sm border border-gray-100 px-4 py-1.5 rounded-full text-center z-10 text-[0.72rem] font-bold text-gray-500 tracking-wider uppercase mb-2">
+              Interactive Lobby Simulator
+            </div>
+
+            <div className="w-full max-w-[340px] bg-white rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.08)] border border-gray-100 overflow-hidden mt-8">
+              
+              {/* Marble header arch representing luxury entrance */}
+              <div className="bg-gradient-to-b from-[#FAF9F5] to-white p-4 border-b border-gray-100 text-center relative">
+                
+                {/* Glowing digital counter panel showing 6 ▲ or G ▼ */}
+                <div className="inline-flex items-center space-x-2 bg-black px-4 py-1.5 rounded-md text-red-500 font-mono text-lg font-bold border-2 border-gray-800 glow-blue">
+                  <span className="text-[#0172CE] animate-pulse">
+                    {displayFloor === "B1" ? "B1" : displayFloor === "G" ? "G" : `${displayFloor}`}
+                  </span>
+                  <span className={`text-[0.75rem] ${isMoving ? 'animate-bounce text-[#73BA27]' : 'text-[#73BA27]'}`}>
+                    {movingDirection === "up" ? "▲" : movingDirection === "down" ? "▼" : "•"}
+                  </span>
+                </div>
+
+                <div className="text-[0.58rem] font-bold tracking-widest text-[#73BA27] uppercase mt-2">
+                  LOBBY LEVEL SELECTION ACTIVE
+                </div>
+              </div>
+
+              {/* Lobby Interior preview with sliding dynamic doors */}
+              <div className="h-68 bg-[#151922] relative overflow-hidden flex items-center justify-center border-b border-gray-100">
+                
+                {/* Back of the elevator shaft: Custom interior image gradient representation */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${floorInteriors[currentFloor]?.gradient || "from-amber-100 to-amber-300"} transition-all duration-700 flex flex-col items-center justify-center p-4 text-center overflow-hidden`}>
+                  
+                  {/* Subtle depth details inside the cabin */}
+                  <div className="absolute inset-x-2 top-2 h-[2px] bg-white/40" />
+                  <div className="absolute inset-[15%] border border-white/20 rounded-md" />
+                  <div className="absolute top-6 w-10 h-14 bg-white/20 backdrop-blur-[2px] rounded border border-white/30" /> {/* Cabin mirror */}
+                  
+                  <div className="relative z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]">
+                    <div className="w-7 h-7 rounded-full bg-white/90 flex items-center justify-center text-gray-900 font-bold text-xs mx-auto mb-1 shadow-sm">
+                      {currentFloor}
+                    </div>
+                    <div className="font-jost text-[0.62rem] font-black text-gray-900 uppercase tracking-widest leading-none">
+                      {floorInteriors[currentFloor]?.title.split(" ").slice(0, 2).join(" ")}
+                    </div>
+                    <div className="font-jost text-[0.5rem] font-medium text-gray-800 max-w-[120px] mx-auto mt-1 leading-normal opacity-90 hidden sm:block">
+                      {floorInteriors[currentFloor]?.style}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Left Sliding Door */}
+                <div 
+                  className="absolute left-0 top-0 bottom-0 w-1/2 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-400 border-r border-[#B8966E]/40 transition-transform duration-1000 ease-in-out z-20 shadow-[5px_0_15px_rgba(0,0,0,0.15)]"
+                  style={{
+                    transform: doorState === "open" ? "translateX(-92%)" : doorState === "opening" ? "translateX(-92%)" : doorState === "closing" ? "translateX(-15%)" : "translateX(0%)"
+                  }}
+                >
+                  {/* Door vertical grooves */}
+                  <div className="absolute right-4 top-0 bottom-0 w-[1px] bg-slate-300" />
+                  <div className="absolute right-8 top-0 bottom-0 w-[1px] bg-slate-300" />
+                </div>
+
+                {/* Right Sliding Door */}
+                <div 
+                  className="absolute right-0 top-0 bottom-0 w-1/2 bg-gradient-to-l from-gray-200 via-gray-300 to-gray-400 border-l border-[#B8966E]/40 transition-transform duration-1000 ease-in-out z-20 shadow-[-5px_0_15px_rgba(0,0,0,0.15)]"
+                  style={{
+                    transform: doorState === "open" ? "translateX(92%)" : doorState === "opening" ? "translateX(92%)" : doorState === "closing" ? "translateX(15%)" : "translateX(0%)"
+                  }}
+                >
+                  {/* Door vertical grooves */}
+                  <div className="absolute left-4 top-0 bottom-0 w-[1px] bg-slate-300" />
+                  <div className="absolute left-8 top-0 bottom-0 w-[1px] bg-slate-300" />
+                </div>
+
+                {/* Floor arrival ding alert visual */}
+                {doorState === "opening" && (
+                  <div className="absolute inset-0 z-30 bg-[#73BA27]/10 flex items-center justify-center animate-pulse pointer-events-none">
+                    <div className="font-jost text-xs text-[#73BA27] font-bold bg-white/95 px-3 py-1 rounded-full shadow-md tracking-widest uppercase">
+                      🛎️ Floor Reached!
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Physical Floor Controller panel at the bottom of the card */}
+              <div className="p-4 bg-gray-50 flex flex-col justify-center">
+                <div className="text-[0.62rem] font-bold tracking-widest text-[#0172CE] uppercase mb-2 text-center">
+                  Select Target Floor
+                </div>
+                
+                {/* Responsive grid of floor key buttons */}
+                <div className="grid grid-cols-4 gap-2">
+                  {floors.map((fl) => {
+                    const isActive = targetFloor === fl;
+                    const isPassed = currentFloor === fl;
+                    
+                    return (
+                      <button
+                        key={fl}
+                        disabled={isMoving}
+                        onClick={() => handleElevatorCall(fl)}
+                        className={`py-2 rounded-lg font-mono text-sm font-semibold transition-all shadow-sm ${
+                          isActive 
+                            ? "bg-[#73BA27] text-white font-extrabold ring-2 ring-emerald-300 scale-95" 
+                            : isPassed 
+                            ? "bg-[#0172CE]/10 text-[#0172CE] border border-[#0172CE]/20" 
+                            : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200 active:scale-90"
+                        } ${isMoving ? "opacity-70 cursor-not-allowed" : "cursor-pointer"}`}
+                      >
+                        {fl}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Live Status indicator */}
+                <div className="mt-3 text-center">
+                  <span className="font-mono text-[0.6rem] text-gray-500 uppercase tracking-wide">
+                    {isMoving ? (
+                      <span className="text-[#0172CE] animate-pulse">
+                        In Transit: Going to Floor {targetFloor}...
+                      </span>
+                    ) : (
+                      <span>Currently parked at Floor {currentFloor}</span>
+                    )}
+                  </span>
+                </div>
+
+              </div>
+
+            </div>
+
+            {/* FLOATING SAFETY CERTIFIED BADGE */}
+            <motion.div 
+              className="absolute -bottom-8 -left-2 md:-left-12 z-30 bg-white/95 backdrop-blur-md shadow-[0_12px_36px_rgba(0,0,0,0.12)] border-[1.5px] border-[#73BA27]/30 p-3.5 rounded-2xl flex items-center space-x-3 cursor-pointer select-none max-w-[240px]"
+              animate={{ 
+                y: [0, -8, 0],
+              }}
+              transition={{ 
+                duration: 5, 
+                repeat: Infinity, 
+                ease: "easeInOut" 
+              }}
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => setShowSafetyDetails(!showSafetyDetails)}
+            >
+              <div className="relative">
+                <div className="w-10 h-10 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-[#73BA27]">
+                  <ShieldCheck className="w-5.5 h-5.5" />
+                </div>
+                {/* Ripple Circle Animation */}
+                <span className="absolute inset-0 rounded-full border border-[#73BA27] animate-ping opacity-35 pointer-events-none"></span>
+              </div>
+              
+              <div>
+                <div className="font-jost text-[0.68rem] font-black text-[#73BA27] tracking-[0.14em] uppercase flex items-center gap-1.5 leading-none">
+                  <span>SAFETY CERTIFIED</span>
+                  <span className="w-1.5 h-1.5 bg-[#73BA27] rounded-full animate-pulse"></span>
+                </div>
+                <div className="font-jost text-[0.62rem] text-gray-500 font-semibold leading-tight tracking-wide mt-1">
+                  100% Safety Standards Verified
+                </div>
+                <div className="font-mono text-[0.52rem] text-[#0172CE] font-bold uppercase tracking-wider mt-1 flex items-center">
+                  <span>TAP TO VERIFY</span>
+                  <ChevronRight className="w-2.5 h-2.5 ml-0.5" />
+                </div>
+              </div>
+            </motion.div>
+
+            {/* SAFETY DETAILS MODAL OVERLAY */}
+            <AnimatePresence>
+              {showSafetyDetails && (
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.95, y: 15 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95, y: 15 }}
+                  className="absolute bottom-16 left-1/2 -translate-x-1/2 w-[90%] sm:w-[325px] bg-[#151922] text-white p-5 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,0.35)] border border-[#73BA27]/40 z-40 backdrop-blur-xl"
+                >
+                  <div className="flex justify-between items-start mb-3 border-b border-gray-800 pb-2.5">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-7 h-7 rounded-full bg-[#73BA27]/15 flex items-center justify-center text-[#73BA27]">
+                        <ShieldCheck className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <h4 className="font-jost text-[0.72rem] font-black tracking-wider uppercase text-white">
+                          SAFETY VERIFICATION
+                        </h4>
+                        <p className="font-mono text-[0.52rem] text-gray-400 font-semibold uppercase">
+                          SPECTRUM STANDARDS
+                        </p>
+                      </div>
+                    </div>
+                    <button 
+                      onClick={() => setShowSafetyDetails(false)}
+                      className="text-gray-400 hover:text-white transition-colors p-1"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                  
+                  <div className="space-y-2 mb-4">
+                    <div className="flex items-start space-x-2 text-[0.72rem]">
+                      <Check className="w-3.5 h-3.5 text-[#73BA27] mt-0.5 shrink-0" />
+                      <div>
+                        <span className="font-bold text-gray-200">ISO 9001:2015 QA Certified</span>
+                        <p className="font-mono text-[0.58rem] text-gray-400">Strict manufacturing execution system & quality control.</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-2 text-[0.72rem]">
+                      <Check className="w-3.5 h-3.5 text-[#73BA27] mt-0.5 shrink-0" />
+                      <div>
+                        <span className="font-bold text-gray-200">Emergency ARD Integration</span>
+                        <p className="font-mono text-[0.58rem] text-gray-400">Automatic rescue device guarantees floor landing on outage.</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-2 text-[0.72rem]">
+                      <Check className="w-3.5 h-3.5 text-[#73BA27] mt-0.5 shrink-0" />
+                      <div>
+                        <span className="font-bold text-gray-200">IS 14665 Compliant Controls</span>
+                        <p className="font-mono text-[0.58rem] text-gray-400">Rigorous national safety override config.</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-2 text-[0.72rem]">
+                      <Check className="w-3.5 h-3.5 text-[#73BA27] mt-0.5 shrink-0" />
+                      <div>
+                        <span className="font-bold text-gray-200">Overspeed Governor catch</span>
+                        <p className="font-mono text-[0.58rem] text-gray-400">Mechanical catches instantly lock cab in free-fall speed events.</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-2 text-[0.72rem]">
+                      <Check className="w-3.5 h-3.5 text-[#73BA27] mt-0.5 shrink-0" />
+                      <div>
+                        <span className="font-bold text-gray-200">Full Height Curtain Sensors</span>
+                        <p className="font-mono text-[0.58rem] text-gray-400">Non-contact multi-beam infrared light curtain system.</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button 
+                    onClick={() => setShowSafetyDetails(false)}
+                    className="w-full bg-[#73BA27] hover:bg-[#62a31f] text-white py-2 rounded-xl text-center font-jost text-[0.72rem] font-bold tracking-[0.10em] uppercase transition-colors cursor-pointer"
+                  >
+                    Got It, Verified ✓
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+          </div>
+
+        </div>
+
+      </section>
+
+      {/* SECTION 2.5 — FLOATING METRICS STRIP TRACED FROM THE REFERENCE IMAGE */}
+      <div className="w-full px-6 md:px-12 relative -mt-16 md:-mt-24 z-20">
+        <div className="max-w-7xl mx-auto bg-white rounded-3xl shadow-[0_15px_45px_rgba(0,0,0,0.06)] border border-gray-100 p-6 md:p-8 flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-gray-100 gap-6 md:gap-0 justify-between">
+          
+          {/* Stat Item 1 */}
+          <div className="flex-1 flex items-center space-x-4 justify-start md:justify-center pb-4 md:pb-0">
+            <div className="w-12 h-12 rounded-full bg-[#73BA27]/10 flex items-center justify-center text-[#73BA27]">
+              <Shield className="w-6 h-6" />
+            </div>
+            <div>
+              <div className="font-jost text-xl font-bold text-gray-900 leading-tight">100%</div>
+              <div className="font-jost text-xs text-gray-500 font-medium tracking-wide uppercase">Safety Commitment</div>
+            </div>
+          </div>
+
+          {/* Stat Item 2 */}
+          <div className="flex-1 flex items-center space-x-4 justify-start md:justify-center py-4 md:py-0">
+            <div className="w-12 h-12 rounded-full bg-[#0172CE]/10 flex items-center justify-center text-[#0172CE]">
+              <Award className="w-6 h-6" />
+            </div>
+            <div>
+              <div className="font-jost text-xl font-bold text-gray-900 leading-tight">Premium</div>
+              <div className="font-jost text-xs text-gray-500 font-medium tracking-wide uppercase">Quality Materials</div>
+            </div>
+          </div>
+
+          {/* Stat Item 3 */}
+          <div className="flex-1 flex items-center space-x-4 justify-start md:justify-center py-4 md:py-0">
+            <div className="w-12 h-12 rounded-full bg-[#73BA27]/10 flex items-center justify-center text-[#73BA27]">
+              <Users className="w-6 h-6" />
+            </div>
+            <div>
+              <div className="font-jost text-xl font-bold text-gray-900 leading-tight">500+</div>
+              <div className="font-jost text-xs text-gray-500 font-medium tracking-wide uppercase">Happy Customers</div>
+            </div>
+          </div>
+
+          {/* Stat Item 4 */}
+          <div className="flex-1 flex items-center space-x-4 justify-start md:justify-center pt-4 md:pt-0">
+            <div className="w-12 h-12 rounded-full bg-[#0172CE]/10 flex items-center justify-center text-[#0172CE]">
+              <Wrench className="w-6 h-6" />
+            </div>
+            <div>
+              <div className="font-jost text-xl font-bold text-gray-900 leading-tight">24/7</div>
+              <div className="font-jost text-xs text-gray-500 font-medium tracking-wide uppercase">Service Support</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+
+      {/* SECTION 3 — DOUBLE OPPOSITE MARQUEE STRIPS */}
+      <div className="py-2.5 bg-[#F9F9FB] border-t border-b border-gray-200/50 flex flex-col space-y-1 overflow-hidden select-none mt-12">
+        
+        {/* Track 1: Moving left (Clockwise illusion) */}
+        <div className="relative w-full overflow-hidden flex h-7 items-center">
+          <div className="animate-marquee-left whitespace-nowrap flex items-center shrink-0">
+            {Array(4).fill(null).map((_, groupIdx) => (
+              <span key={`g1-${groupIdx}`} className="font-mono text-[0.72rem] text-gray-500 font-extrabold tracking-[0.18em] uppercase flex items-center shrink-0">
+                <span>NEW INSTALLATIONS</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#73BA27] mx-4 inline-block shrink-0 shadow-[0_0_6px_rgba(115,186,39,0.6)]"></span>
+                <span>IN-HOUSE CONTROLLER TECHNOLOGY</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#0172CE] mx-4 inline-block shrink-0 shadow-[0_0_6px_rgba(1,114,206,0.6)]"></span>
+                <span>24/7 EMERGENCY SUPPORT</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#73BA27] mx-4 inline-block shrink-0 shadow-[0_0_6px_rgba(115,186,39,0.6)]"></span>
+                <span>MODERNIZATION & UPGRADES</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#0172CE] mx-4 inline-block shrink-0 shadow-[0_0_6px_rgba(1,114,206,0.6)]"></span>
+                <span>CERTIFIED TECHNICIANS</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#73BA27] mx-4 inline-block shrink-0 shadow-[0_0_6px_rgba(115,186,39,0.6)]"></span>
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* Track 2: Moving right (Anti-clockwise illusion) */}
+        <div className="relative w-full overflow-hidden flex h-7 items-center">
+          <div className="animate-marquee-right whitespace-nowrap flex items-center shrink-0">
+            {Array(4).fill(null).map((_, groupIdx) => (
+              <span key={`g2-${groupIdx}`} className="font-mono text-[0.72rem] text-gray-400 font-extrabold tracking-[0.18em] uppercase flex items-center shrink-0">
+                <span>HYDERABAD HQ</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#0172CE] mx-4 inline-block shrink-0 shadow-[0_0_6px_rgba(1,114,206,0.6)]"></span>
+                <span>MUMBAI OPERATIONS</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#73BA27] mx-4 inline-block shrink-0 shadow-[0_0_6px_rgba(115,186,39,0.6)]"></span>
+                <span>NANDED DIVISION</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#0172CE] mx-4 inline-block shrink-0 shadow-[0_0_6px_rgba(1,114,206,0.6)]"></span>
+                <span>SAFE · SMOOTH · SUPERIOR</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#73BA27] mx-4 inline-block shrink-0 shadow-[0_0_6px_rgba(115,186,39,0.6)]"></span>
+                <span>SPECTRUM ELEVATORS</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#0172CE] mx-4 inline-block shrink-0 shadow-[0_0_6px_rgba(1,114,206,0.6)]"></span>
+              </span>
+            ))}
+          </div>
+        </div>
+
+      </div>
+
+
+      {/* SECTION 4 — ABOUT */}
+      <section id="about" className="py-28 px-6 md:px-12 lg:px-20 bg-white relative overflow-hidden">
+        
+        {/* Soft engineering dots pattern and glow layers */}
+        <div className="absolute inset-0 bg-dots-pattern opacity-[0.4] pointer-events-none" />
+        <div className="absolute top-1/2 left-10 w-72 h-72 bg-[#73BA27]/4 rounded-full blur-[90px] pointer-events-none" />
+        <div className="absolute bottom-10 right-10 w-80 h-80 bg-[#0172CE]/3 rounded-full blur-[100px] pointer-events-none" />
+        
+        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-16 lg:gap-24 relative z-10">
+
+          
+          {/* Left Column Stats (50% or 2x2 grid) */}
+          <div className="w-full lg:w-1/2 grid grid-cols-1 sm:grid-cols-2 gap-6 reveal">
+            
+            {/* Box 1 */}
+            <div className="border border-gray-100 bg-[#F9F9FB] rounded-2xl p-8 flex flex-col justify-between hover:border-[#73BA27]/30 hover:shadow-md transition-all duration-300">
+              <span className="font-jost text-[3.5rem] font-bold text-[#73BA27] leading-none mb-4">
+                15+
+              </span>
+              <span className="font-mono text-[0.68rem] text-gray-500 uppercase tracking-[0.15em] leading-relaxed font-bold">
+                Years Experience
+              </span>
+            </div>
+
+            {/* Box 2 */}
+            <div className="border border-gray-100 bg-[#F9F9FB] rounded-2xl p-8 flex flex-col justify-between hover:border-[#0172CE]/30 hover:shadow-md transition-all duration-300">
+              <span className="font-jost text-[3.5rem] font-bold text-[#0172CE] leading-none mb-4">
+                3
+              </span>
+              <span className="font-mono text-[0.68rem] text-gray-500 uppercase tracking-[0.15em] leading-relaxed font-bold">
+                Operational Cities
+              </span>
+            </div>
+
+            {/* Box 3 */}
+            <div className="border border-gray-100 bg-[#F9F9FB] rounded-2xl p-8 flex flex-col justify-between hover:border-[#73BA27]/30 hover:shadow-md transition-all duration-300">
+              <span className="font-jost text-[3.5rem] font-bold text-[#73BA27] leading-none mb-4">
+                5
+              </span>
+              <span className="font-mono text-[0.68rem] text-gray-500 uppercase tracking-[0.15em] leading-relaxed font-bold">
+                Elevator Types Available
+              </span>
+            </div>
+
+            {/* Box 4 */}
+            <div className="border border-gray-100 bg-[#F9F9FB] rounded-2xl p-8 flex flex-col justify-between hover:border-[#0172CE]/30 hover:shadow-md transition-all duration-300">
+              <span className="font-jost text-[3.5rem] font-bold text-[#0172CE] leading-none mb-4">
+                24/7
+              </span>
+              <span className="font-mono text-[0.68rem] text-gray-500 uppercase tracking-[0.15em] leading-relaxed font-bold">
+                Emergency Priority Support
+              </span>
+            </div>
+
+          </div>
+
+          {/* Right Column Text Block */}
+          <div className="w-full lg:w-1/2 flex flex-col justify-center reveal">
+            
+            <div className="flex items-center space-x-3 mb-6">
+              <span className="w-8 h-[2px] bg-[#73BA27]"></span>
+              <span className="font-jost text-xs font-bold text-gray-800 tracking-[0.15em] uppercase">
+                WHO WE ARE
+              </span>
+            </div>
+
+            <h2 className="font-jost text-3xl md:text-[2.6rem] leading-[1.2] font-semibold text-gray-900 mb-8">
+              Your Partner in <span className="text-[#73BA27] block sm:inline">Elevating Excellence</span>
+            </h2>
+
+            <p className="font-jost text-[0.98rem] text-gray-500 font-normal leading-[1.9] mb-6">
+              At Spectrum Elevators, we specialize in delivering top-notch elevator solutions — from new lift installations through advanced control modifications, dependable repairs, and thorough maintenance.
+            </p>
+
+            <p className="font-jost text-[0.98rem] text-gray-500 font-normal leading-[1.9] mb-8">
+              Committed to excellence and safety, our certified experts are available around the clock to ensure smooth and efficient operations for all types of buildings.
+            </p>
+
+            {/* Premium tag row */}
+            <div className="flex flex-wrap gap-2.5">
+              {["Residential", "Commercial", "Industrial", "Safety Certified", "Hyderabad", "Mumbai"].map((tag, index) => (
+                <span 
+                  key={index}
+                  className="bg-gray-50 border border-gray-100 text-gray-500 font-jost text-[0.72rem] font-bold uppercase tracking-[0.12em] px-4 py-2 hover:border-[#73BA27] hover:bg-white hover:text-[#73BA27] transition-all duration-300 rounded-md"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+
+      {/* SECTION 5 — SERVICES */}
+      <section id="services" className="py-28 px-6 md:px-12 lg:px-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto">
+          
+          {/* Header Row */}
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-6 reveal">
+            <div>
+              <div className="flex items-center space-x-3 mb-4">
+                <span className="w-8 h-[2px] bg-[#73BA27]"></span>
+                <span className="font-jost text-xs font-bold text-gray-800 tracking-[0.15em] uppercase">
+                  WHAT WE DO
+                </span>
+              </div>
+              <h2 className="font-jost text-3xl md:text-5xl font-semibold text-gray-900">
+                High Quality Services
+              </h2>
+            </div>
+            
+            <button 
+              onClick={() => scrollToSection("contact")}
+              className="group font-jost text-[0.82rem] font-bold uppercase tracking-[0.15em] text-[#73BA27] flex items-center space-x-2 border-b-2 border-[#73BA27]/30 pb-1.5 hover:border-[#73BA27] transition-all duration-300 cursor-pointer"
+            >
+              <span>Enquire Now</span>
+              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+            </button>
+          </div>
+
+          {/* Service Cards 2x3 grid using beautiful borders & white card designs */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 reveal">
+            
+            {services.map((srv, index) => (
+              <div 
+                key={index}
+                className="group relative overflow-hidden bg-white hover:shadow-xl border border-gray-100 p-8 flex flex-col justify-between h-80 transition-all duration-500 rounded-2xl"
+              >
+                {/* Visual indicator lines on hover */}
+                <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-[#73BA27] scale-y-0 group-hover:scale-y-100 origin-top transition-transform duration-300" />
+                <div className="absolute right-0 top-0 bottom-0 w-[4px] bg-[#0172CE] scale-y-0 group-hover:scale-y-100 origin-bottom transition-transform duration-300" />
+                
+                {/* Top content */}
+                <div>
+                  <div className="flex justify-between items-center">
+                    <span className="font-mono text-xs text-[#73BA27] font-bold bg-[#73BA27]/10 px-2.5 py-1 rounded">
+                      {srv.num}
+                    </span>
+                    <Layers className="w-5 h-5 text-gray-300 group-hover:text-[#0172CE] transition-colors" />
+                  </div>
+                  
+                  <h3 className="font-jost text-[1.05rem] font-bold uppercase tracking-[0.05em] text-gray-900 mt-6 mb-3 group-hover:text-[#73BA27] transition-colors">
+                    {srv.title}
+                  </h3>
+                  
+                  <p className="font-jost text-[0.85rem] text-gray-500 leading-[1.8] font-normal">
+                    {srv.desc}
+                  </p>
+                </div>
+
+                {/* Bottom link layout */}
+                <span className="font-jost text-[0.72rem] font-bold text-[#73BA27] tracking-[0.1em] opacity-80 group-hover:opacity-100 transition-opacity duration-300 flex items-center space-x-1.5 uppercase mt-4">
+                  <span>Learn details</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </span>
+                
+              </div>
+            ))}
+
+          </div>
+        </div>
+      </section>
+
+
+      {/* SECTION 6 — ELEVATOR TYPES */}
+      <section id="products" className="py-28 px-6 md:px-12 lg:px-20 bg-white relative overflow-hidden">
+        
+        {/* Subtle engineering background lines */}
+        <div className="absolute inset-0 bg-grid-pattern opacity-30 pointer-events-none" />
+        
+        <div className="max-w-7xl mx-auto relative z-10">
+          
+          <div className="reveal mb-16">
+            <div className="flex items-center space-x-3 mb-4">
+              <span className="w-8 h-[2px] bg-[#73BA27]"></span>
+              <span className="font-jost text-xs font-bold text-[#73BA27] tracking-[0.15em] uppercase">
+                PRODUCTS SHOWROOM
+              </span>
+            </div>
+            <h2 className="font-jost text-3xl md:text-5xl font-semibold text-gray-900">
+              Engineered Lift Solutions
+            </h2>
+            <p className="font-jost text-sm text-gray-500 mt-2 font-normal max-w-[620px]">
+              Tap or hover any category to load live technical specifications and architectural blueprints.
+            </p>
+          </div>
+
+          {/* Interactive Products Grid layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
+            
+            {/* Left Column: Interactive Categories (Accordion / List) */}
+            <div className="w-full lg:col-span-6 flex flex-col divide-y divide-gray-100 reveal">
+              
+              {elevatorTypes.map((type, idx) => {
+                const isActive = activeProductIndex === idx;
+                
+                return (
+                  <div 
+                    key={idx}
+                    onMouseEnter={() => setActiveProductIndex(idx)}
+                    onClick={() => setActiveProductIndex(idx)}
+                    className={`transition-all duration-300 py-6 pr-4 cursor-pointer flex flex-col justify-start relative ${
+                      isActive 
+                        ? "bg-gradient-to-r from-[#73BA27]/5 via-transparent to-transparent pl-4 border-l-4 border-[#73BA27]" 
+                        : "hover:bg-gray-50/50 pl-2 border-l-4 border-transparent"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex items-center space-x-4">
+                        {/* Index number */}
+                        <div className={`font-jost text-[1.4rem] font-bold leading-none ${
+                          isActive ? "text-[#73BA27]" : "text-gray-300"
+                        }`}>
+                          {type.num}
+                        </div>
+                        
+                        {/* Type name */}
+                        <div className={`font-jost text-[1.05rem] font-bold uppercase tracking-[0.05em] transition-colors leading-tight ${
+                          isActive ? "text-[#0172CE]" : "text-gray-900"
+                        }`}>
+                          {type.name}
+                        </div>
+                      </div>
+
+                      {/* Active indicator bead */}
+                      {isActive && (
+                        <div className="flex items-center space-x-1.5">
+                          <span className="w-2 h-2 rounded-full bg-[#73BA27] animate-pulse"></span>
+                          <span className="font-mono text-[0.62rem] text-[#73BA27] font-bold uppercase tracking-wider hidden sm:inline">Active telemetry</span>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Description */}
+                    <div className="font-jost text-[0.88rem] text-gray-500 leading-relaxed font-normal mt-3 pl-8">
+                      {type.desc}
+                    </div>
+
+                    {/* Specifications expansion for mobile users nested within item */}
+                    {isActive && (
+                      <div className="mt-4 pl-8 pt-4 border-t border-dashed border-gray-100 lg:hidden space-y-2.5">
+                        <div className="grid grid-cols-2 gap-2 text-[0.72rem]">
+                          <div>
+                            <span className="text-gray-400 font-medium block">MAX SPEED</span>
+                            <span className="text-gray-800 font-bold">{
+                              idx === 0 ? "0.4 m/s (Silent)" :
+                              idx === 1 ? "1.0 m/s - 1.75 m/s" :
+                              idx === 2 ? "1.5 m/s - 2.5 m/s" :
+                              idx === 3 ? "0.5 m/s - 1.0 m/s" : "0.25 m/s - 0.75 m/s"
+                            }</span>
+                          </div>
+                          <div>
+                            <span className="text-gray-400 font-medium block">LOAD CAPABILITY</span>
+                            <span className="text-gray-800 font-bold">{
+                              idx === 0 ? "250kg - 450kg" :
+                              idx === 1 ? "450kg - 1360kg" :
+                              idx === 2 ? "680kg - 1600kg" :
+                              idx === 3 ? "1000kg - 5000kg" : "1000kg - 3000kg"
+                            }</span>
+                          </div>
+                        </div>
+
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            // pre-fill and scroll
+                            setFormData(prev => ({
+                              ...prev,
+                              service: "New Lift Installations",
+                              message: `I would like to receive an estimate for "${type.name}". Please provide details regarding speed options and concrete layout constraints.`
+                            }));
+                            scrollToSection("contact");
+                          }}
+                          className="mt-2 w-full bg-[#73BA27] hover:bg-[#62a31f] text-white py-2 rounded-lg font-jost text-[0.72rem] font-bold uppercase tracking-wider transition-colors"
+                        >
+                          Enquire About {type.name}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+
+            </div>
+
+            {/* Right Column: Visual Telemetry Viewer (Desktop only card that floats and switches files) */}
+            <div className="w-full lg:col-span-6 hidden lg:block reveal sticky top-28">
+              <div className="bg-[#151922] text-white rounded-3xl p-6 shadow-2xl border-2 border-gray-800 overflow-hidden relative group">
+                
+                {/* Tech glowing pattern across the panel background */}
+                <div className="absolute inset-0 bg-circuit-pattern opacity-10 pointer-events-none" />
+                
+                {/* Technical Corner indicators */}
+                <div className="absolute top-4 left-4 font-mono text-[0.52rem] text-gray-500 uppercase tracking-widest">
+                  SYS_TELEMETRY: ACTIVE_VIEW_0{activeProductIndex + 1}
+                </div>
+                <div className="absolute top-4 right-4 font-mono text-[0.52rem] text-[#73BA27] uppercase tracking-widest flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 bg-[#73BA27] rounded-full animate-ping"></span>
+                  <span>ONLINE SENSOR</span>
+                </div>
+
+                {/* Main Render Image Block */}
+                <div className="h-64 rounded-2xl overflow-hidden relative border border-gray-800 mt-4 shadow-inner group">
+                  <AnimatePresence mode="wait">
+                    <motion.img
+                      key={activeProductIndex}
+                      src={
+                        activeProductIndex === 0 ? luxuryVillaElevator :
+                        activeProductIndex === 1 ? smartElevatorTech :
+                        activeProductIndex === 2 ? "https://picsum.photos/seed/office-elevator/600/450" :
+                        activeProductIndex === 3 ? "https://picsum.photos/seed/industrial-elevator/600/450" :
+                        "https://picsum.photos/seed/freight-lift/600/400"
+                      }
+                      alt={elevatorTypes[activeProductIndex].name}
+                      referrerPolicy="no-referrer"
+                      initial={{ opacity: 0, scale: 1.05 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ duration: 0.4 }}
+                      className="w-full h-full object-cover brightness-95 group-hover:scale-105 transition-transform duration-500"
+                    />
+                  </AnimatePresence>
+
+                  {/* Gradient bottom cover overlay inside the image */}
+                  <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-gray-950/90 to-transparent flex items-end p-4">
+                    <div>
+                      <div className="font-mono text-[0.58rem] text-[#73BA27] font-semibold tracking-wider uppercase leading-none mb-1">
+                        SPECTRUM AUTHENTIC LAYOUT
+                      </div>
+                      <h4 className="font-jost text-base font-black text-white uppercase tracking-wide leading-none">
+                        {elevatorTypes[activeProductIndex].name}
+                      </h4>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Telemetry statistics labels */}
+                <div className="grid grid-cols-2 gap-4 mt-6 border-b border-gray-800 pb-5 text-[0.78rem]">
+                  
+                  <div>
+                    <span className="font-mono text-[0.58rem] text-gray-500 uppercase tracking-widest block mb-1">
+                      VVVF INTENSITY SPEED
+                    </span>
+                    <span className="font-jost font-bold text-gray-200">
+                      {
+                        activeProductIndex === 0 ? "0.4 m/s (Super Silent Drive)" :
+                        activeProductIndex === 1 ? "1.0 m/s to 1.75 m/s (High Speed)" :
+                        activeProductIndex === 2 ? "1.5 m/s to 2.5 m/s (Ultra Rapid)" :
+                        activeProductIndex === 3 ? "0.5 m/s to 1.0 m/s (Engineered)" : 
+                        "0.25 m/s to 0.75 m/s (Heavy Synchronous)"
+                      }
+                    </span>
+                  </div>
+
+                  <div>
+                    <span className="font-mono text-[0.58rem] text-gray-500 uppercase tracking-widest block mb-1">
+                      CERTIFIED PAYLOAD RATING
+                    </span>
+                    <span className="font-jost font-bold text-gray-200">
+                      {
+                        activeProductIndex === 0 ? "250kg to 450kg (3 - 6 Passengers)" :
+                        activeProductIndex === 1 ? "450kg to 1360kg (6 - 20 Passengers)" :
+                        activeProductIndex === 2 ? "680kg to 1600kg (9 - 24 Passengers)" :
+                        activeProductIndex === 3 ? "1000kg to 5000kg (Industrial Cargo)" : 
+                        "1000kg to 3000kg (Forklift rated)"
+                      }
+                    </span>
+                  </div>
+
+                  <div className="col-span-2">
+                    <span className="font-mono text-[0.58rem] text-[#0172CE] uppercase tracking-widest block mb-1">
+                      STANDARD HARDWARE CONFIGURATION
+                    </span>
+                    <span className="font-jost text-gray-300 block text-[0.72rem] leading-relaxed">
+                      {
+                        activeProductIndex === 0 ? "Low pit requirement (only 300mm), overhead headroom 2900mm. Works on clean single-phase residential 230V connection." :
+                        activeProductIndex === 1 ? "VVVF speed adjustments, non-contact infrared safety columns, electronic double brake, automatic floor landing system on power cut." :
+                        activeProductIndex === 2 ? "Regenerative smart motor returns clean power to Grid, destination routing algorithm, high durability titanium hairline cabin options." :
+                        activeProductIndex === 3 ? "Heavy-gauge reinforced steel channels, steel checker floor, crash barriers, moisture and explosion resistive options available." : 
+                        "Sub-level heavy landing doors, high stability structural frame, dual VVVF coupled motor system for stable freight carriage without shifting tilt."
+                      }
+                    </span>
+                  </div>
+
+                </div>
+
+                {/* Interactive button that pre-files form details */}
+                <div className="mt-5 flex items-center justify-between">
+                  <div className="flex flex-col">
+                    <span className="font-mono text-[0.5rem] text-gray-500 uppercase">Blueprints Status</span>
+                    <span className="text-[#73BA27] text-[0.62rem] font-bold uppercase tracking-widest flex items-center gap-1">
+                      <span className="w-1 h-1 bg-[#73BA27] rounded-full"></span>
+                      <span>Verified IS 14665</span>
+                    </span>
+                  </div>
+
+                  <button 
+                    onClick={() => {
+                      setFormData(prev => ({
+                        ...prev,
+                        service: "New Lift Installations",
+                        message: `Hi, I am looking for architectural details and space requirements planning for the "${elevatorTypes[activeProductIndex].name}" product line. Please revert back.`
+                      }));
+                      scrollToSection("contact");
+                    }}
+                    className="bg-[#73BA27] hover:bg-[#62a31f] text-white px-6 py-2.5 rounded-xl font-jost text-[0.72rem] font-extrabold uppercase tracking-widest flex items-center space-x-1.5 transition-colors cursor-pointer"
+                  >
+                    <span>Request Quotation</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+
+              </div>
+            </div>
+            
+          </div>
+        </div>
+      </section>
+
+
+      {/* SECTION 7 — TESTIMONIALS */}
+      <section id="testimonials" className="py-28 px-6 md:px-12 lg:px-20 bg-gray-50 relative">
+        <div className="max-w-7xl mx-auto">
+          
+          <div className="reveal mb-16">
+            <div className="flex items-center space-x-3 mb-4">
+              <span className="w-8 h-[2px] bg-[#73BA27]"></span>
+              <span className="font-jost text-xs font-bold text-[#73BA27] tracking-[0.15em] uppercase">
+                TESTIMONIALS
+              </span>
+            </div>
+            <h2 className="font-jost text-3xl md:text-5xl font-semibold text-gray-900">
+              What Our Clients Say
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 reveal">
+            
+            {testimonials.map((t, idx) => (
+              <div 
+                key={idx}
+                className="bg-white p-8 md:p-10 relative flex flex-col justify-between h-80 hover:shadow-xl border border-gray-100 transition-all duration-300 rounded-2xl"
+              >
+                
+                {/* High quality quote quote absolute */}
+                <div className="font-playfair text-[5.5rem] font-bold italic text-[#73BA27]/10 absolute top-2 right-6 select-none leading-none pointer-events-none">
+                  ”
+                </div>
+                
+                {/* Quote text */}
+                <p className="font-jost text-[0.95rem] italic text-gray-600 leading-[1.8] font-normal z-10">
+                  "{t.text}"
+                </p>
+
+                {/* Author footer */}
+                <div>
+                  <div className="w-[30px] h-[3px] bg-[#73BA27] my-5 rounded-full"></div>
+                  
+                  <div className="flex items-center justify-between">
+                    <span className="font-jost text-[0.8rem] font-extrabold uppercase tracking-[0.15em] text-gray-900">
+                      {t.author}
+                    </span>
+                    <span className="text-[0.68rem] text-gray-400 font-bold uppercase tracking-wider bg-gray-50 px-2.5 py-1 rounded">
+                      {t.location}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+
+          </div>
+        </div>
+      </section>
+
+
+      {/* SECTION 8 — CONTACT */}
+      <section id="contact" className="py-28 px-6 md:px-12 lg:px-20 bg-white">
+        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-16 lg:gap-24">
+          
+          {/* Left Column — Contact info details */}
+          <div className="w-full lg:w-1/2 flex flex-col justify-center reveal">
+            
+            <div className="mb-10">
+              <div className="flex items-center space-x-3 mb-4">
+                <span className="w-8 h-[2px] bg-[#73BA27]"></span>
+                <span className="font-jost text-xs font-bold text-gray-800 tracking-[0.15em] uppercase">
+                  GET IN TOUCH
+                </span>
+              </div>
+              <h2 className="font-jost text-3xl md:text-5xl font-semibold text-gray-900 mb-6 leading-tight">
+                Consult With Our Design Engineers
+              </h2>
+              <p className="font-jost text-[0.98rem] text-gray-500 leading-[1.8] font-normal max-w-[480px]">
+                Have a customized architectural requirement? Let us design an efficient, safe, and space-saving vertical transit plan tailored perfectly to your layout.
+              </p>
+            </div>
+
+            <div className="space-y-5">
+              
+              {/* Phone item */}
+              <div className="flex items-start gap-4 pb-5 border-b border-gray-100">
+                <div className="w-9 h-9 shrink-0 border border-[#73BA27]/20 flex items-center justify-center text-[#73BA27] rounded-lg bg-[#73BA27]/5">
+                  <Phone className="w-4 h-4 fill-[#73BA27]" />
+                </div>
+                <div>
+                  <div className="font-jost text-[0.68rem] text-gray-400 uppercase font-extrabold tracking-widest mb-1">
+                    Phone Response Line
+                  </div>
+                  <div className="font-jost text-[0.92rem] text-gray-900 font-bold">
+                    <a href="tel:7702019702" className="hover:text-[#73BA27] transition-colors inline-block mr-3">
+                      7702019702
+                    </a>
+                    <span className="text-gray-300 font-light">/</span>
+                    <a href="tel:9701195725" className="hover:text-[#73BA27] transition-colors inline-block ml-3">
+                      9701195725
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              {/* Email item */}
+              <div className="flex items-start gap-4 pb-5 border-b border-gray-100">
+                <div className="w-9 h-9 shrink-0 border border-[#0172CE]/20 flex items-center justify-center text-[#0172CE] rounded-lg bg-[#0172CE]/5">
+                  <Mail className="w-4 h-4 fill-[#0172CE]" />
+                </div>
+                <div>
+                  <div className="font-jost text-[0.68rem] text-gray-400 uppercase font-extrabold tracking-widest mb-1">
+                    Email Correspondence
+                  </div>
+                  <div className="font-jost text-[0.92rem] text-gray-900 font-bold">
+                    <a href="mailto:info@spectrumelevators.in" className="hover:text-[#73BA27] transition-colors underline decoration-[#73BA27]/20 decoration-1">
+                      info@spectrumelevators.in
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              {/* Head Office item */}
+              <div className="flex items-start gap-4 pb-5 border-b border-gray-100">
+                <div className="w-9 h-9 shrink-0 border border-[#73BA27]/20 flex items-center justify-center text-[#73BA27] rounded-lg bg-[#73BA27]/5">
+                  <MapPin className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="font-jost text-[0.68rem] text-gray-400 uppercase font-extrabold tracking-widest mb-1">
+                    Head Office
+                  </div>
+                  <div className="font-jost text-[0.88rem] text-gray-600 font-medium leading-relaxed">
+                    H.No 6-3-248/B/1, Dhruv Arcade, 2nd Floor, Road No.1, Banjara Hills, Hyderabad — 500034
+                  </div>
+                </div>
+              </div>
+
+              {/* Branches item */}
+              <div className="flex items-start gap-4 pb-5 border-b border-gray-100">
+                <div className="w-9 h-9 shrink-0 border border-[#0172CE]/20 flex items-center justify-center text-[#0172CE] rounded-lg bg-[#0172CE]/5">
+                  <Building className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="font-jost text-[0.68rem] text-gray-400 uppercase font-extrabold tracking-widest mb-1">
+                    Branch Offices
+                  </div>
+                  <div className="font-jost text-[0.88rem] text-gray-600 font-medium">
+                    Nanded · Mumbai (Dombivli West)
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          {/* Right Column — Contact form */}
+          <div className="w-full lg:w-1/2 reveal bg-[#F9F9FB] p-8 md:p-12 border border-gray-100 rounded-3xl shadow-sm">
+            <h3 className="font-jost text-[1.4rem] font-bold text-gray-900 mb-6">
+              Send An Inquiry
+            </h3>
+            
+            {formSubmitted ? (
+              <div className="p-8 border border-[#73BA27] bg-white text-center flex flex-col items-center gap-4 rounded-2xl animate-fadeIn">
+                <div className="w-12 h-12 rounded-full border border-[#73BA27] flex items-center justify-center text-[#73BA27] bg-[#73BA27]/5">
+                  <Check className="w-6 h-6" />
+                </div>
+                <h4 className="font-jost text-[1.2rem] font-bold text-gray-900">
+                  Thank You!
+                </h4>
+                <p className="font-jost text-[0.88rem] text-gray-500 leading-[1.7] max-w-[320px]">
+                  Your message has been processed correctly. Our project manager will reach out within 24 operational hours.
+                </p>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-6">
+                
+                {/* Name */}
+                <div className="flex flex-col space-y-2">
+                  <label htmlFor="name" className="font-jost text-[0.72rem] font-bold uppercase text-[#73BA27] tracking-wider">
+                    Name
+                  </label>
+                  <input 
+                    type="text" 
+                    id="name" 
+                    name="name"
+                    required
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    placeholder="Enter your full name"
+                    className="bg-white border border-gray-200 text-gray-900 font-jost text-[0.88rem] p-3.5 focus:border-[#73BA27] focus:ring-1 focus:ring-[#73BA27] outline-none transition-all rounded-xl placeholder:text-gray-400 shadow-inner"
+                  />
+                </div>
+
+                {/* Phone */}
+                <div className="flex flex-col space-y-2">
+                  <label htmlFor="phone" className="font-jost text-[0.72rem] font-bold uppercase text-[#73BA27] tracking-wider">
+                    Phone
+                  </label>
+                  <input 
+                    type="tel" 
+                    id="phone" 
+                    name="phone"
+                    required
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    placeholder="Enter your phone number"
+                    className="bg-white border border-gray-200 text-gray-900 font-jost text-[0.88rem] p-3.5 focus:border-[#73BA27] focus:ring-1 focus:ring-[#73BA27] outline-none transition-all rounded-xl placeholder:text-gray-400 shadow-inner"
+                  />
+                </div>
+
+                {/* Service Category */}
+                <div className="flex flex-col space-y-2">
+                  <label htmlFor="service" className="font-jost text-[0.72rem] font-bold uppercase text-[#73BA27] tracking-wider">
+                    Required Service
+                  </label>
+                  <select 
+                    id="service" 
+                    name="service"
+                    value={formData.service}
+                    onChange={handleInputChange}
+                    className="bg-white border border-gray-200 text-gray-900 font-jost text-[0.88rem] p-3.5 focus:border-[#73BA27] focus:ring-1 focus:ring-[#73BA27] outline-none transition-all rounded-xl cursor-pointer"
+                  >
+                    {services.map((srv, i) => (
+                      <option key={i} value={srv.title}>
+                        {srv.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Message */}
+                <div className="flex flex-col space-y-2">
+                  <label htmlFor="message" className="font-jost text-[0.72rem] font-bold uppercase text-[#73BA27] tracking-wider">
+                    Message Spec Request
+                  </label>
+                  <textarea 
+                    id="message" 
+                    name="message"
+                    rows={4}
+                    value={formData.message}
+                    onChange={handleInputChange}
+                    placeholder="Explain your visual elevator constraints or custom architectural requirements..."
+                    className="bg-white border border-gray-200 text-gray-900 font-jost text-[0.88rem] p-3.5 focus:border-[#73BA27] focus:ring-1 focus:ring-[#73BA27] outline-none transition-all rounded-xl placeholder:text-gray-400 shadow-inner resize-none"
+                  />
+                </div>
+
+                {/* Submit button */}
+                <button 
+                  type="submit"
+                  className="w-full bg-[#73BA27] text-white py-4 rounded-full font-jost text-[0.82rem] uppercase font-bold tracking-wider hover:bg-[#62a31f] hover:shadow-lg active:scale-[0.98] transition-all duration-300 cursor-pointer shadow-md"
+                >
+                  Send Inquiry Now
+                </button>
+
+              </form>
+            )}
+
+          </div>
+        </div>
+      </section>
+
+
+      {/* SECTION 9 — FOOTER */}
+      <footer className="bg-gray-50 border-t border-gray-200/60 pt-20">
+        <div className="max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 pb-16">
+          
+          {/* Column 1 */}
+          <div>
+            <div 
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} 
+              className="cursor-pointer select-none mb-4 inline-block"
+            >
+              <SpectrumLogo size="normal" />
+            </div>
+            
+            <p className="font-jost text-[0.82rem] text-gray-500 leading-[1.8] max-w-[240px]">
+              Premium engineering solutions elevating safe design across multi-story landmarks, bespoke penthouses, and logistics complexes since 2009.
+            </p>
+          </div>
+
+          {/* Column 2 */}
+          <div>
+            <h5 className="font-jost text-[0.82rem] uppercase tracking-wider text-gray-900 font-bold mb-4">
+              Quick Links
+            </h5>
+            <ul className="space-y-2">
+              {["Home", "About Us", "Products", "Services", "Contact Us"].map((link, i) => (
+                <li key={i}>
+                  <button 
+                    onClick={() => {
+                      const targetMap: Record<string, string> = {
+                        "home": "hero",
+                        "about us": "about",
+                        "products": "products",
+                        "services": "services",
+                        "contact us": "contact"
+                      };
+                      scrollToSection(targetMap[link.toLowerCase()]);
+                    }}
+                    className="font-jost text-[0.82rem] text-gray-500 hover:text-[#73BA27] transition-colors text-left font-medium"
+                  >
+                    {link}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Column 3 */}
+          <div>
+            <h5 className="font-jost text-[0.82rem] uppercase tracking-wider text-gray-900 font-bold mb-4">
+              Services Offered
+            </h5>
+            <ul className="space-y-2">
+              {["New Installations", "Controller Tech", "Repair & Maintenance", "Control Modification"].map((link, i) => (
+                <li key={i}>
+                  <button 
+                    onClick={() => scrollToSection("services")}
+                    className="font-jost text-[0.82rem] text-gray-500 hover:text-[#73BA27] transition-colors text-left font-medium"
+                  >
+                    {link}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Column 4 */}
+          <div>
+            <h5 className="font-jost text-[0.82rem] uppercase tracking-wider text-gray-900 font-bold mb-4">
+              Branch Offices
+            </h5>
+            <ul className="space-y-2 font-jost text-[0.82rem] text-gray-500 font-medium">
+              <li>Hyderabad HQ (Banjara Hills)</li>
+              <li>Nanded Office</li>
+              <li>Mumbai Branch (Dombivli W)</li>
+            </ul>
+          </div>
+
+        </div>
+
+        {/* Footer bottom bar */}
+        <div className="border-t border-gray-200/60 px-6 md:px-12 py-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <div className="font-jost text-[0.78rem] text-gray-400 font-medium">
+            © 2026 Spectrum Elevators Private Limited. All Rights Reserved.
+          </div>
+          <div className="font-jost text-[0.78rem] text-gray-500 font-bold hover:text-[#73BA27] transition-colors">
+            <a href="mailto:info@spectrumelevators.in">info@spectrumelevators.in</a>
+          </div>
+        </div>
+      </footer>
+
+
+      {/* EXTRAS: WhatsApp floating action bubble */}
+      <a 
+        href="https://wa.me/9701195725" 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        className="fixed bottom-6 right-6 w-12 h-12 rounded-full bg-[#25D366] flex items-center justify-center shadow-[0_4px_16px_rgba(37,211,102,0.3)] hover:scale-110 active:scale-95 transition-transform z-50 cursor-pointer shadow-[0_4px_20px_#25D366]/40"
+        aria-label="Contact us on WhatsApp"
+      >
+        <svg 
+          viewBox="0 0 24 24" 
+          className="w-6 h-6 fill-white"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path d="M12.012 2C6.485 2 2 6.484 2 12.011c0 1.767.46 3.426 1.267 4.877L2 22l5.244-1.378a9.972 9.972 0 004.768 1.21c5.527 0 10.012-4.485 10.012-10.011C22.024 6.485 17.539 2 12.012 2zm6.056 14.18c-.248.699-1.238 1.353-1.785 1.454-.533.1-1.07.135-2.73-.53-2.15-.86-3.528-3.055-3.636-3.2-.108-.145-.886-1.18-.886-2.252 0-1.072.56-1.597.759-1.812.199-.215.432-.269.576-.269.144 0 .288.003.414.01.134.007.311-.051.488.375.18.435.617 1.503.67 1.61.054.108.09.233.018.376-.072.143-.108.232-.216.357-.108.125-.228.28-.324.376-.11.108-.225.226-.096.446.128.22.568.937 1.22 1.517.842.75 1.554.982 1.776 1.093.222.11.354.093.486-.06.133-.153.568-.662.721-.887.153-.225.306-.18.514-.103.21.077 1.325.625 1.55.736.225.111.375.166.43.262.054.096.054.558-.194 1.258z" />
+        </svg>
+      </a>
+
+    </div>
+  );
+}

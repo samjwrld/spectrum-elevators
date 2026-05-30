@@ -1,6 +1,6 @@
 {
   "name": "Spectrum Elevators",
-  "description": "A luxury industrial elevator manufacturing and installation website themed as a premium elevator journey.",
-  "requestFramePermissions": ["camera"],
+  "description": "Innovative, reliable, and safe elevator solutions for every building — from luxury residences to commercial towers.",
+  "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

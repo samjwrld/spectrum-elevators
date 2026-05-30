@@ -1,89 +1,153 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@300;400;500&family=Barlow+Condensed:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Space+Mono:wght@400;700&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --font-display: "Playfair Display", serif;
-  --font-mono: "IBM Plex Mono", monospace;
-  --font-sans: "Barlow Condensed", sans-serif;
-
-  --color-gold: #C9A84C;
-  --color-steel-900: #0D0D0D;
-  --color-steel-800: #1A1A1A;
-  --color-steel-700: #2A2A2A;
-  --color-warm-white: #E8E0D0;
-
-  --animate-floor-flicker: floor-flicker 0.4s ease-out forwards;
-  --animate-rumble: rumble 0.2s ease-in-out infinite;
+  --font-playfair: 'Playfair Display', serif;
+  --font-jost: 'Jost', sans-serif;
+  --font-mono: 'Space Mono', monospace;
+  
+  --color-bg: #FFFFFF;
+  --color-bg2: #F9F9FB;
+  --color-bg3: #FFFFFF;
+  --color-gold: #B8966E;
+  --color-gold2: #D4B896;
+  --color-green-leaf: #73BA27;
+  --color-blue-royal: #0172CE;
+  --color-charcoal: #151922;
+  --color-gray-soft: #5A5A6A;
+  --color-border: rgba(115, 186, 39, 0.1);
 }
 
-@keyframes floor-flicker {
-  0% { filter: brightness(1); }
-  20% { filter: brightness(1.3); }
-  40% { filter: brightness(1); }
-  60% { filter: brightness(1.1); }
-  100% { filter: brightness(1); }
+:root {
+  --bg: #FFFFFF;
+  --bg2: #F9F9FB;
+  --bg3: #FFFFFF;
+  --gold: #B8966E;
+  --gold2: #D4B896;
+  --green-leaf: #73BA27;
+  --blue-royal: #0172CE;
+  --charcoal: #151922;
+  --gray-soft: #5A5A6A;
+  --border: rgba(115, 186, 39, 0.12);
 }
 
-@keyframes rumble {
-  0% { transform: translateY(0px) translateX(0px); }
-  25% { transform: translateY(0.5px) translateX(-0.5px); }
-  50% { transform: translateY(-0.5px) translateX(0.5px); }
-  75% { transform: translateY(0.5px) translateX(0.5px); }
-  100% { transform: translateY(0px) translateX(0px); }
+html {
+  scroll-behavior: smooth;
+  background-color: #FFFFFF;
+  color: #151922;
 }
 
-@layer base {
-  body {
-    @apply bg-steel-900 text-warm-white font-mono selection:bg-gold selection:text-steel-900 overflow-x-hidden;
+body {
+  font-family: 'Jost', sans-serif;
+  overflow-x: hidden;
+}
+
+/* Custom transitions and scroll reveals */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Custom animation for fading in alerts and menus */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
   }
-
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-display;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-.brushed-metal {
-  background-image: repeating-linear-gradient(
-    45deg,
-    rgba(255, 255, 255, 0.05),
-    rgba(255, 255, 255, 0.05) 1px,
-    transparent 1px,
-    transparent 4px
-  );
-  background-color: #1A1A1A;
+.animate-fadeIn {
+  animation: fadeIn 0.4s ease-out forwards;
 }
 
-.brushed-metal-dark {
-  background-image: repeating-linear-gradient(
-    45deg,
-    rgba(255, 255, 255, 0.02),
-    rgba(255, 255, 255, 0.02) 1px,
-    transparent 1px,
-    transparent 4px
-  );
-  background-color: #0D0D0D;
+/* Beautiful custom glow effects */
+.glow-green {
+  box-shadow: 0 0 15px rgba(115, 186, 39, 0.25);
 }
 
-.panel-line {
-  @apply border-steel-700;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 1px 0 rgba(0,0,0,0.5);
+.glow-blue {
+  box-shadow: 0 0 15px rgba(1, 114, 206, 0.25);
 }
 
-.rivet {
-  @apply w-1.5 h-1.5 rounded-full bg-steel-900 border border-steel-700 shadow-inner;
+/* Elegant horizontal scroll bar customization */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 }
 
-.noise-overlay {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-  opacity: 0.03;
-  pointer-events: none;
+::-webkit-scrollbar-track {
+  background: #F9F9FB;
 }
 
-.glow-gold {
-  box-shadow: 0 0 15px rgba(201, 168, 76, 0.3);
+::-webkit-scrollbar-thumb {
+  background: #E4E5EA;
+  border-radius: 4px;
 }
 
-.glass-card {
-  @apply bg-steel-800/40 backdrop-blur-md border border-steel-700;
+::-webkit-scrollbar-thumb:hover {
+  background: #B8966E;
+}
+
+/* Highly optimized smooth infinite scrolling marquee */
+@keyframes marquee-left {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
+}
+
+@keyframes marquee-right {
+  0% { transform: translate3d(-50%, 0, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+.animate-marquee-left {
+  display: inline-flex;
+  width: max-content;
+  animation: marquee-left 35s linear infinite;
+}
+
+.animate-marquee-right {
+  display: inline-flex;
+  width: max-content;
+  animation: marquee-right 35s linear infinite;
+}
+
+.animate-marquee-left:hover,
+.animate-marquee-right:hover {
+  animation-play-state: paused;
+}
+
+/* Luxury UX architectural patterns and grid accents */
+.bg-grid-pattern {
+  background-image: 
+    linear-gradient(to right, rgba(115, 186, 39, 0.025) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(115, 186, 39, 0.025) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.bg-dots-pattern {
+  background-image: radial-gradient(rgba(1, 114, 206, 0.04) 1.5px, transparent 1.5px);
+  background-size: 20px 20px;
+}
+
+.bg-circuit-pattern {
+  background-size: 48px 48px;
+  background-image: 
+    linear-gradient(45deg, rgba(115, 186, 39, 0.015) 25%, transparent 25%, transparent 75%, rgba(115, 186, 39, 0.015) 75%),
+    linear-gradient(45deg, rgba(1, 114, 206, 0.015) 25%, transparent 25%, transparent 75%, rgba(1, 114, 206, 0.015) 75%);
+}
+
+.isometric-card {
+  perspective: 1000px;
+  transform-style: preserve-3d;
 }
 
