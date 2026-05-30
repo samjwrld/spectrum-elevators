@@ -38,7 +38,7 @@ import { motion, AnimatePresence } from "motion/react";
 
 // Generated visual elements for brand elevation
 import luxuryVillaElevator from "./assets/images/luxury_villa_elevator_1780118810684.png";
-import heroImg from "./assets/images/hero.png";
+import heroImg from "./assets/images/luxury_hero_lobby_1780153539610.png";
 import logoImg from "./assets/images/logo.png";
 
 
@@ -47,7 +47,7 @@ export function SpectrumLogo({ className = "", size = "normal" }: { className?: 
   const heightClasses = {
     small: "h-9 sm:h-10",
     normal: "h-11 sm:h-12",
-    large: "h-16 sm:h-20",
+    large: "h-14 sm:h-[4.25rem]",
   };
 
   return (
@@ -263,7 +263,7 @@ export default function App() {
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} 
             className="cursor-pointer select-none"
           >
-            <SpectrumLogo size="normal" />
+            <SpectrumLogo size="large" />
           </div>
 
           {/* Desktop Navigation Links */}
@@ -381,7 +381,7 @@ export default function App() {
         )}
       </header>
       {/* SECTION 2 — HERO */}
-      <section id="hero" className="pt-20 md:pt-24 min-h-[720px] md:h-[820px] lg:h-[880px] xl:h-[920px] bg-[#FAF9F7] relative overflow-hidden flex flex-col justify-between">
+      <section id="hero" className="pt-20 md:pt-24 min-h-[580px] md:h-[640px] lg:h-[690px] xl:h-[720px] bg-[#FAF9F7] relative overflow-hidden flex flex-col justify-between">
         
         {/* Architectural drafting grid pattern and subtle ambient gradient glows */}
         <div className="absolute inset-0 bg-grid-pattern opacity-40 pointer-events-none z-0" />
@@ -396,21 +396,6 @@ export default function App() {
             referrerPolicy="no-referrer"
             className="w-full h-full object-cover" 
           />
-          {/* Subtle dark layout overlay vignette */}
-          <div className="absolute inset-y-0 left-0 right-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
-          
-          {/* Glowing digital counter panel showing "6 ▲" exactly from the mockup */}
-          <div className="absolute top-28 right-24 bg-black px-4 py-1.5 rounded-md text-[#73BA27] font-mono text-lg font-bold border-2 border-gray-800 shadow-[0_0_20px_rgba(115,186,39,0.3)] select-none">
-            <span className="text-[#0172CE] select-none animate-pulse">6</span>
-            <span className="text-[#73BA27] select-none ml-2">▲</span>
-          </div>
-          
-          {/* Subtle floating controller indicator overlay from original mockup right side */}
-          <div className="absolute right-12 top-1/2 -translate-y-1/2 w-8 h-24 bg-black/80 backdrop-blur-sm rounded-md border border-gray-800 flex flex-col items-center justify-between p-2">
-            <div className="w-1.5 h-1.5 bg-[#73BA27] rounded-full animate-ping" />
-            <div className="w-4 h-[2px] bg-gray-700" />
-            <div className="w-3 h-3 rounded-full border border-gray-400 flex items-center justify-center font-mono text-[0.45rem] text-gray-300 font-bold">G</div>
-          </div>
         </div>
 
         {/* BEAUTIFUL MAJESTIC CURVED TRANSITION MASK TRACED FROM THE REFERENCE IMAGE */}
@@ -456,79 +441,79 @@ export default function App() {
         </div>
 
         
-        <div className="max-w-7xl mx-auto px-6 md:px-12 pt-10 pb-44 md:pt-0 md:pb-28 w-full grid grid-cols-1 md:grid-cols-12 gap-12 items-center relative z-20 h-full flex-grow">
+        <div className="max-w-7xl mx-auto px-6 md:px-12 pt-8 pb-36 md:pt-8 lg:pt-10 xl:pt-12 md:pb-14 w-full grid grid-cols-1 md:grid-cols-12 gap-12 md:items-start items-center relative z-20 h-full flex-grow">
           
           {/* Left Column Content */}
           <div className="w-full md:col-span-5 lg:col-span-4 flex flex-col justify-center">
             
             {/* Small headline label with a light-green row accent */}
-            <div className="flex items-center space-x-3 mb-6">
-              <span className="w-12 h-[2px] bg-[#73BA27] block"></span>
-              <span className="font-jost text-xs md:text-sm text-gray-800 font-bold tracking-[0.12em] uppercase">
+            <div className="flex items-center space-x-3 mb-4 shrink-0">
+              <span className="w-12 h-[2px] bg-[#73BA27] block shrink-0"></span>
+              <span className="font-jost text-xs md:text-sm text-gray-800 font-bold tracking-[0.12em] uppercase whitespace-nowrap">
                 Smart Elevators. Smarter Living.
               </span>
             </div>
 
             {/* Stunning premium heading from the reference image */}
-            <h1 className="font-jost leading-[1.125] text-[2.35rem] sm:text-[3.2rem] lg:text-[3.8rem] xl:text-[4rem] font-semibold text-gray-900 tracking-tight mb-6">
+            <h1 className="font-jost leading-[1.125] text-[2.2rem] sm:text-[2.8rem] lg:text-[3.2rem] xl:text-[3.4rem] font-semibold text-gray-900 tracking-tight mb-4">
               <div className="block whitespace-nowrap">Elevate Life with</div>
               <div className="text-[#73BA27] underline decoration-gray-100 underline-offset-4 block whitespace-nowrap">Safety, Style &</div>
               <div className="text-[#0172CE] block md:whitespace-nowrap">Superior Technology</div>
             </h1>
 
             {/* Paragraph body text matching the image */}
-            <p className="font-jost text-[0.95rem] md:text-[1.05rem] font-normal text-gray-500 max-w-[540px] leading-[1.8] mb-10">
+            <p className="font-jost text-[0.9rem] md:text-[0.98rem] font-normal text-gray-500 max-w-[500px] leading-[1.7] mb-4">
               Premium elevator solutions for homes, commercial spaces and real estate projects. Built for safety. Designed for comfort. Made to last.
             </p>
 
             {/* 4 horizontal micro highlight columns layout with beautiful status icons */}
-            <div className="grid grid-cols-4 gap-1 items-center border border-gray-100/80 bg-white/40 backdrop-blur-sm rounded-2xl p-4 shadow-[0_4px_20px_rgba(0,0,0,0.01)] mb-10 divide-x divide-gray-200/60">
+            <div className="grid grid-cols-4 gap-1 items-center border border-gray-100/80 bg-white/40 backdrop-blur-sm rounded-xl p-2 shadow-[0_4px_20px_rgba(0,0,0,0.01)] mb-3 divide-x divide-gray-200/60">
               
               <div className="flex flex-col items-center text-center px-1">
-                <div className="w-9 h-9 rounded-full bg-[#73BA27]/8 flex items-center justify-center text-[#73BA27] mb-2 shadow-[0_2px_8px_rgba(115,186,39,0.05)]">
-                  <Shield className="w-4.5 h-4.5" />
+                <div className="w-7 h-7 rounded-full bg-[#73BA27]/8 flex items-center justify-center text-[#73BA27] mb-1 shadow-[0_2px_8px_rgba(115,186,39,0.05)]">
+                  <Shield className="w-3.5 h-3.5" />
                 </div>
-                <span className="font-jost text-[0.70rem] md:text-[0.75rem] font-bold text-gray-800 tracking-tight leading-none uppercase">Advanced Safety</span>
+                <span className="font-jost text-[0.58rem] md:text-[0.62rem] font-bold text-gray-800 tracking-tight leading-none uppercase">Advanced Safety</span>
               </div>
 
               <div className="flex flex-col items-center text-center px-1">
-                <div className="w-9 h-9 rounded-full bg-[#0172CE]/8 flex items-center justify-center text-[#0172CE] mb-2 shadow-[0_2px_8px_rgba(1,114,206,0.05)]">
-                  <Volume2 className="w-4.5 h-4.5" />
+                <div className="w-7 h-7 rounded-full bg-[#0172CE]/8 flex items-center justify-center text-[#0172CE] mb-1 shadow-[0_2px_8px_rgba(1,114,206,0.05)]">
+                  <Volume2 className="w-3.5 h-3.5" />
                 </div>
-                <span className="font-jost text-[0.70rem] md:text-[0.75rem] font-bold text-gray-800 tracking-tight leading-none uppercase">Smooth & Silent</span>
+                <span className="font-jost text-[0.58rem] md:text-[0.62rem] font-bold text-gray-800 tracking-tight leading-none uppercase">Smooth & Silent</span>
               </div>
 
               <div className="flex flex-col items-center text-center px-1">
-                <div className="w-9 h-9 rounded-full bg-[#73BA27]/8 flex items-center justify-center text-[#73BA27] mb-2 shadow-[0_2px_8px_rgba(115,186,39,0.05)]">
-                  <Brush className="w-4.5 h-4.5" />
+                <div className="w-7 h-7 rounded-full bg-[#73BA27]/8 flex items-center justify-center text-[#73BA27] mb-1 shadow-[0_2px_8px_rgba(115,186,39,0.05)]">
+                  <Brush className="w-3.5 h-3.5" />
                 </div>
-                <span className="font-jost text-[0.70rem] md:text-[0.75rem] font-bold text-gray-800 tracking-tight leading-none uppercase">Luxury Designs</span>
+                <span className="font-jost text-[0.58rem] md:text-[0.62rem] font-bold text-gray-800 tracking-tight leading-none uppercase">Luxury Designs</span>
               </div>
 
               <div className="flex flex-col items-center text-center px-1">
-                <div className="w-9 h-9 rounded-full bg-[#0172CE]/8 flex items-center justify-center text-[#0172CE] mb-2 shadow-[0_2px_8px_rgba(1,114,206,0.05)]">
-                  <UserCheck className="w-4.5 h-4.5" />
+                <div className="w-7 h-7 rounded-full bg-[#0172CE]/8 flex items-center justify-center text-[#0172CE] mb-1 shadow-[0_2px_8px_rgba(1,114,206,0.05)]">
+                  <UserCheck className="w-3.5 h-3.5" />
                 </div>
-                <span className="font-jost text-[0.70rem] md:text-[0.75rem] font-bold text-gray-800 tracking-tight leading-none uppercase">Reliable Support</span>
+                <span className="font-jost text-[0.58rem] md:text-[0.62rem] font-bold text-gray-800 tracking-tight leading-none uppercase">Reliable Support</span>
               </div>
 
             </div>
 
             {/* Dynamic Actions block */}
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-2.5">
               <button 
                 onClick={() => scrollToSection("contact")}
-                className="bg-[#73BA27] hover:bg-[#62a31f] text-white px-8 py-4 px-9 rounded-full font-jost text-[0.88rem] uppercase font-bold tracking-[0.1em] hover:shadow-lg transition-all duration-300 cursor-pointer flex items-center justify-center space-x-2.5 shadow-md animate-glow"
+                className="bg-[#73BA27] hover:bg-[#62a31f] text-white px-4 py-2.5 rounded-full font-jost text-[0.74rem] uppercase font-bold tracking-[0.08em] hover:shadow-md transition-all duration-300 cursor-pointer flex items-center justify-center space-x-2 shadow-sm animate-glow"
               >
-                <Calendar className="w-4 h-4" />
+                <Calendar className="w-3.5 h-3.5" />
                 <span>Book Free Consultation</span>
               </button>
               
               <button 
                 onClick={() => scrollToSection("contact")}
-                className="bg-white hover:bg-gray-50 text-gray-800 border border-gray-200 hover:border-gray-300 px-8 py-4 px-9 rounded-full font-jost text-[0.88rem] uppercase font-bold tracking-[0.1em] hover:shadow-md transition-all duration-300 cursor-pointer flex items-center justify-center space-x-2.5 shadow-sm"
+                className="bg-white hover:bg-gray-50 text-gray-800 border border-gray-200 hover:border-gray-300 px-4 py-2.5 rounded-full font-jost text-[0.74rem] uppercase font-bold tracking-[0.08em] hover:shadow-sm transition-all duration-300 cursor-pointer flex items-center justify-center space-x-2 shadow-sm"
               >
-                <FileText className="w-4 h-4 text-[#0172CE]" />
+                <FileText className="w-3.5 h-3.5 text-[#0172CE]" />
                 <span>Get a Free Estimate</span>
               </button>
             </div>
@@ -560,7 +545,7 @@ export default function App() {
       </section>
 
       {/* SECTION 2.5 — FLOATING METRICS STRIP TRACED FROM THE REFERENCE IMAGE */}
-      <div className="w-full px-6 md:px-12 relative -mt-16 md:-mt-24 z-20">
+      <div className="w-full px-6 md:px-12 relative -mt-12 md:-mt-14 z-20">
         <div className="max-w-7xl mx-auto bg-white rounded-3xl shadow-[0_15px_45px_rgba(0,0,0,0.06)] border border-gray-100 p-6 md:p-8 flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-gray-100 gap-6 md:gap-0 justify-between">
           
           {/* Stat Item 1 */}
