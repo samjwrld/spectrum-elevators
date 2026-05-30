@@ -30,14 +30,16 @@ import {
   Layers,
   Calendar,
   FileText,
-  UserCheck
+  UserCheck,
+  Upload,
+  Image as ImageIcon
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
 // Generated visual elements for brand elevation
 import luxuryVillaElevator from "./assets/images/luxury_villa_elevator_1780118810684.png";
-import smartElevatorTech from "./assets/images/smart_elevator_tech_1780118834269.png";
-import spectrumLogoImg from "./assets/images/spectrum_logo_1780121476410.png";
+import heroImg from "./assets/images/hero.png";
+import logoImg from "./assets/images/logo.png";
 
 
 // Reusable high-fidelity matching brand logo component
@@ -51,7 +53,7 @@ export function SpectrumLogo({ className = "", size = "normal" }: { className?: 
   return (
     <div className={`flex items-center ${className}`}>
       <img
-        src={spectrumLogoImg}
+        src={logoImg}
         alt="Spectrum Elevators Logo"
         referrerPolicy="no-referrer"
         className={`${heightClasses[size]} w-auto object-contain`}
@@ -64,19 +66,10 @@ export function SpectrumLogo({ className = "", size = "normal" }: { className?: 
 export default function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
-  const [showSafetyDetails, setShowSafetyDetails] = useState(false);
   
-  // Interactive Elevator State
-  const [currentFloor, setCurrentFloor] = useState("6");
-  const [targetFloor, setTargetFloor] = useState("6");
-  const [doorState, setDoorState] = useState<"open" | "closed" | "opening" | "closing">("open");
-  const [isMoving, setIsMoving] = useState(false);
-  const [movingDirection, setMovingDirection] = useState<"up" | "down" | null>(null);
-  const [simulatedPath, setSimulatedPath] = useState<string[]>([]);
-  const [displayFloor, setDisplayFloor] = useState("6");
+  // Active product index
   const [activeProductIndex, setActiveProductIndex] = useState(0);
 
-  
   // Form states
   const [formData, setFormData] = useState({
     name: "",
@@ -85,151 +78,6 @@ export default function App() {
     message: ""
   });
   const [lastSubmittedData, setLastSubmittedData] = useState<{ name: string; phone: string; service: string; message: string } | null>(null);
-  
-  const floors = ["6", "5", "4", "3", "2", "1", "G", "B1"];
-
-  // Unique interior descriptions based on the selected floor
-  const floorInteriors: Record<string, { title: string; style: string; gradient: string }> = {
-    "6": { 
-      title: "Penthouse Gold Crystal Lounge", 
-      style: "High-end warm gold brass panels with crystal ambient backlights", 
-      gradient: "from-[#F1E5D1] via-[#E2C799] to-[#C9A05C]" 
-    },
-    "5": { 
-      title: "Deluxe Corporate Mirror panels", 
-      style: "Brushed champagne stainless steel with seamless infinity mirrors", 
-      gradient: "from-[#E6E8EA] via-[#D1D5DB] to-[#B1B5BC]" 
-    },
-    "4": { 
-      title: "Modern Botanical Atrium View", 
-      style: "Biophilic moss wall highlights with warm natural LED strips", 
-      gradient: "from-[#E8F5E9] via-[#C8E6C9] to-[#A5D6A7]" 
-    },
-    "3": { 
-      title: "Abstract Premium Art Gallery", 
-      style: "Sleek textured obsidian cladding with warm spotlight highlights", 
-      gradient: "from-[#2A2B3D] via-[#1D1E2C] to-[#0A0B10]" 
-    },
-    "2": { 
-      title: "Fine-Grained Warm Teak Wood Core", 
-      style: "Handcrafted marine-grade teak timber strips with gold linings", 
-      gradient: "from-[#DCBC9D] via-[#C69C72] to-[#B18556]" 
-    },
-    "1": { 
-      title: "Minimalist High-Contrast Silver Steel", 
-      style: "Brushed matte chrome panels with surgical high-intensity cleanrooms", 
-      gradient: "from-[#E4F1F5] via-[#CADEE6] to-[#B0CEDB]" 
-    },
-    "G": { 
-      title: "Grand Marble Imperial Entrance Logo", 
-      style: "Italian white Carrara marble with gold-veined accents", 
-      gradient: "from-[#FFFFFF] via-[#F4F4F6] to-[#E9EAED]" 
-    },
-    "B1": { 
-      title: "Secure Intelligent Indigo Lounge Zone", 
-      style: "Sleek carbon fiber paneling with neon dynamic guide light indicators", 
-      gradient: "from-[#1A237E] via-[#0D47A1] to-[#01579B]" 
-    }
-  };
-
-  // Sound chime chime (web audio API)
-  const playArrivalChime = () => {
-    try {
-      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-      
-      // High note
-      const osc1 = audioCtx.createOscillator();
-      const gain1 = audioCtx.createGain();
-      osc1.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
-      osc1.type = "sine";
-      gain1.gain.setValueAtTime(0.12, audioCtx.currentTime);
-      gain1.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.2);
-      osc1.connect(gain1);
-      gain1.connect(audioCtx.destination);
-      osc1.start();
-      osc1.stop(audioCtx.currentTime + 1.2);
-
-      // Harmonizing higher note half a beat later
-      setTimeout(() => {
-        const osc2 = audioCtx.createOscillator();
-        const gain2 = audioCtx.createGain();
-        osc2.frequency.setValueAtTime(880.00, audioCtx.currentTime); // A5
-        osc2.type = "sine";
-        gain2.gain.setValueAtTime(0.08, audioCtx.currentTime);
-        gain2.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.2);
-        osc2.connect(gain2);
-        gain2.connect(audioCtx.destination);
-        osc2.start();
-        osc2.stop(audioCtx.currentTime + 1.2);
-      }, 150);
-
-    } catch (e) {
-      console.log("Audio chiming not supported or blocked by browser gesture permissions.");
-    }
-  };
-
-  // Trigger elevator motion
-  const handleElevatorCall = (floor: string) => {
-    if (floor === currentFloor || isMoving) return;
-    
-    setTargetFloor(floor);
-    setIsMoving(true);
-    
-    // Determine path
-    const currentIndex = floors.indexOf(currentFloor);
-    const targetIndex = floors.indexOf(floor);
-    const isGoingUp = currentIndex > targetIndex; // inverse array order
-    setMovingDirection(isGoingUp ? "up" : "down");
-    
-    // Generate middle path steps
-    const stepPath: string[] = [];
-    if (isGoingUp) {
-      for (let i = currentIndex - 1; i >= targetIndex; i--) {
-        stepPath.push(floors[i]);
-      }
-    } else {
-      for (let i = currentIndex + 1; i <= targetIndex; i++) {
-        stepPath.push(floors[i]);
-      }
-    }
-    setSimulatedPath(stepPath);
-
-    // Initial sequence: close door first
-    setDoorState("closing");
-    
-    // Once closed, begin movement ticks
-    setTimeout(() => {
-      setDoorState("closed");
-    }, 1000);
-  };
-
-  // Simulate Floor motion step by step
-  useEffect(() => {
-    if (isMoving && doorState === "closed" && simulatedPath.length > 0) {
-      const nextStepTimeout = setTimeout(() => {
-        const nextFloor = simulatedPath[0];
-        setDisplayFloor(nextFloor);
-        setSimulatedPath((prev) => prev.slice(1));
-        
-        if (simulatedPath.length === 1) {
-          // Reached target
-          setTimeout(() => {
-            setCurrentFloor(nextFloor);
-            setIsMoving(false);
-            setMovingDirection(null);
-            playArrivalChime();
-            setDoorState("opening");
-            
-            setTimeout(() => {
-              setDoorState("open");
-            }, 1000);
-          }, 800);
-        }
-      }, 1000);
-
-      return () => clearTimeout(nextStepTimeout);
-    }
-  }, [isMoving, doorState, simulatedPath, currentFloor]);
 
   // Intersection Observer scroll reveal
   useEffect(() => {
@@ -532,24 +380,86 @@ export default function App() {
           </div>
         )}
       </header>
-
-
       {/* SECTION 2 — HERO */}
-      <section id="hero" className="pt-24 min-h-screen pb-16 md:pb-28 bg-gradient-to-br from-white via-[#FAF9F7] to-[#F1F3EE] relative overflow-hidden flex flex-col justify-between">
+      <section id="hero" className="pt-20 md:pt-24 min-h-[720px] md:h-[820px] lg:h-[880px] xl:h-[920px] bg-[#FAF9F7] relative overflow-hidden flex flex-col justify-between">
         
         {/* Architectural drafting grid pattern and subtle ambient gradient glows */}
-        <div className="absolute inset-0 bg-grid-pattern opacity-50 pointer-events-none" />
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#73BA27]/8 rounded-full blur-[100px] pointer-events-none" />
-        <div className="absolute bottom-1/3 right-1/4 w-[400px] h-[400px] bg-[#0172CE]/6 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute inset-0 bg-grid-pattern opacity-40 pointer-events-none z-0" />
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#73BA27]/5 rounded-full blur-[100px] pointer-events-none z-0" />
+        <div className="absolute bottom-1/3 right-1/4 w-[400px] h-[400px] bg-[#0172CE]/4 rounded-full blur-[120px] pointer-events-none z-0" />
         
-        {/* Background graphic curve masks similar to the luxury wave in the image */}
-        <div className="absolute top-0 right-0 w-[55%] h-full bg-[#F5F5FA] rounded-l-[100px] md:rounded-l-[250px] overflow-hidden -z-0 hidden md:block border-l border-white/20 shadow-[inset_10px_0_30px_rgba(0,0,0,0.01)]" />
+        {/* RIGHT SIDE HERO IMAGE (Beautiful Lobby Showcase with no gaps) */}
+        <div className="absolute inset-y-0 right-0 w-[68%] hidden md:block select-none z-0">
+          <img 
+            src={heroImg} 
+            alt="Spectrum Luxury Elevator Cabin in Hallway"
+            referrerPolicy="no-referrer"
+            className="w-full h-full object-cover" 
+          />
+          {/* Subtle dark layout overlay vignette */}
+          <div className="absolute inset-y-0 left-0 right-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+          
+          {/* Glowing digital counter panel showing "6 ▲" exactly from the mockup */}
+          <div className="absolute top-28 right-24 bg-black px-4 py-1.5 rounded-md text-[#73BA27] font-mono text-lg font-bold border-2 border-gray-800 shadow-[0_0_20px_rgba(115,186,39,0.3)] select-none">
+            <span className="text-[#0172CE] select-none animate-pulse">6</span>
+            <span className="text-[#73BA27] select-none ml-2">▲</span>
+          </div>
+          
+          {/* Subtle floating controller indicator overlay from original mockup right side */}
+          <div className="absolute right-12 top-1/2 -translate-y-1/2 w-8 h-24 bg-black/80 backdrop-blur-sm rounded-md border border-gray-800 flex flex-col items-center justify-between p-2">
+            <div className="w-1.5 h-1.5 bg-[#73BA27] rounded-full animate-ping" />
+            <div className="w-4 h-[2px] bg-gray-700" />
+            <div className="w-3 h-3 rounded-full border border-gray-400 flex items-center justify-center font-mono text-[0.45rem] text-gray-300 font-bold">G</div>
+          </div>
+        </div>
+
+        {/* BEAUTIFUL MAJESTIC CURVED TRANSITION MASK TRACED FROM THE REFERENCE IMAGE */}
+        <div className="absolute inset-0 hidden md:block pointer-events-none z-10 select-none">
+          <svg 
+            viewBox="0 0 1000 1000" 
+            preserveAspectRatio="none" 
+            className="h-full w-full"
+          >
+            <defs>
+              <linearGradient id="curve-fade" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor="#FAF9F7" stopOpacity="1" />
+                <stop offset="5%" stopColor="#FAF9F7" stopOpacity="0.85" />
+                <stop offset="15%" stopColor="#FAF9F7" stopOpacity="0.3" />
+                <stop offset="25%" stopColor="#FAF9F7" stopOpacity="0" />
+              </linearGradient>
+            </defs>
+
+            {/* The white/off-white background on the left, curving beautifully */}
+            <path 
+              d="M 0,0 L 560,0 C 420,250 420,750 660,1000 L 0,1000 Z" 
+              className="fill-[#FAF9F7]" 
+            />
+
+            {/* The beautiful white/off-white soft fade overlay that feathers out over the hallway photo */}
+            <path 
+              d="M 560,0 C 420,250 420,750 660,1000 L 1000,1000 L 1000,0 Z" 
+              fill="url(#curve-fade)"
+            />
+
+            {/* Precise layered transition curve styling - glowing white border mimicking the reference ribbon */}
+            <path 
+              d="M 560,0 C 420,250 420,750 660,1000" 
+              className="fill-none stroke-white stroke-[8] opacity-90" 
+            />
+
+            {/* Secondary backing visual shadow-edge of the layered curve */}
+            <path 
+              d="M 558,0 C 418,250 418,750 658,1000" 
+              className="fill-none stroke-black/5 stroke-[3]" 
+            />
+          </svg>
+        </div>
 
         
-        <div className="max-w-7xl mx-auto px-6 md:px-12 py-12 md:py-16 w-full grid grid-cols-1 md:grid-cols-12 gap-12 items-center relative z-10 flex-grow">
+        <div className="max-w-7xl mx-auto px-6 md:px-12 pt-10 pb-44 md:pt-0 md:pb-28 w-full grid grid-cols-1 md:grid-cols-12 gap-12 items-center relative z-20 h-full flex-grow">
           
           {/* Left Column Content */}
-          <div className="w-full md:col-span-7 flex flex-col justify-center">
+          <div className="w-full md:col-span-5 lg:col-span-4 flex flex-col justify-center">
             
             {/* Small headline label with a light-green row accent */}
             <div className="flex items-center space-x-3 mb-6">
@@ -560,10 +470,10 @@ export default function App() {
             </div>
 
             {/* Stunning premium heading from the reference image */}
-            <h1 className="font-jost leading-[1.125] text-[2.35rem] sm:text-[3.2rem] lg:text-[4.2rem] font-semibold text-gray-900 tracking-tight mb-6">
-              <div>Elevate Life with</div>
-              <div className="text-[#73BA27] underline decoration-gray-100 underline-offset-4">Safety, Style &</div>
-              <div className="text-[#0172CE]">Superior Technology</div>
+            <h1 className="font-jost leading-[1.125] text-[2.35rem] sm:text-[3.2rem] lg:text-[3.8rem] xl:text-[4rem] font-semibold text-gray-900 tracking-tight mb-6">
+              <div className="block whitespace-nowrap">Elevate Life with</div>
+              <div className="text-[#73BA27] underline decoration-gray-100 underline-offset-4 block whitespace-nowrap">Safety, Style &</div>
+              <div className="text-[#0172CE] block md:whitespace-nowrap">Superior Technology</div>
             </h1>
 
             {/* Paragraph body text matching the image */}
@@ -572,34 +482,34 @@ export default function App() {
             </p>
 
             {/* 4 horizontal micro highlight columns layout with beautiful status icons */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+            <div className="grid grid-cols-4 gap-1 items-center border border-gray-100/80 bg-white/40 backdrop-blur-sm rounded-2xl p-4 shadow-[0_4px_20px_rgba(0,0,0,0.01)] mb-10 divide-x divide-gray-200/60">
               
-              <div className="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-gray-100 flex flex-col items-center text-center shadow-[0_4px_12px_rgba(0,0,0,0.02)] hover:scale-105 transition-all">
-                <div className="w-10 h-10 rounded-full bg-[#73BA27]/10 flex items-center justify-center text-[#73BA27] mb-2">
-                  <Shield className="w-5 h-5" />
+              <div className="flex flex-col items-center text-center px-1">
+                <div className="w-9 h-9 rounded-full bg-[#73BA27]/8 flex items-center justify-center text-[#73BA27] mb-2 shadow-[0_2px_8px_rgba(115,186,39,0.05)]">
+                  <Shield className="w-4.5 h-4.5" />
                 </div>
-                <span className="font-jost text-xs font-bold text-gray-800 tracking-wide uppercase">Advanced Safety</span>
+                <span className="font-jost text-[0.70rem] md:text-[0.75rem] font-bold text-gray-800 tracking-tight leading-none uppercase">Advanced Safety</span>
               </div>
 
-              <div className="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-gray-100 flex flex-col items-center text-center shadow-[0_4px_12px_rgba(0,0,0,0.02)] hover:scale-105 transition-all">
-                <div className="w-10 h-10 rounded-full bg-[#0172CE]/10 flex items-center justify-center text-[#0172CE] mb-2">
-                  <Volume2 className="w-5 h-5" />
+              <div className="flex flex-col items-center text-center px-1">
+                <div className="w-9 h-9 rounded-full bg-[#0172CE]/8 flex items-center justify-center text-[#0172CE] mb-2 shadow-[0_2px_8px_rgba(1,114,206,0.05)]">
+                  <Volume2 className="w-4.5 h-4.5" />
                 </div>
-                <span className="font-jost text-xs font-bold text-gray-800 tracking-wide uppercase">Smooth & Silent</span>
+                <span className="font-jost text-[0.70rem] md:text-[0.75rem] font-bold text-gray-800 tracking-tight leading-none uppercase">Smooth & Silent</span>
               </div>
 
-              <div className="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-gray-100 flex flex-col items-center text-center shadow-[0_4px_12px_rgba(0,0,0,0.02)] hover:scale-105 transition-all">
-                <div className="w-10 h-10 rounded-full bg-[#73BA27]/10 flex items-center justify-center text-[#73BA27] mb-2">
-                  <Brush className="w-5 h-5" />
+              <div className="flex flex-col items-center text-center px-1">
+                <div className="w-9 h-9 rounded-full bg-[#73BA27]/8 flex items-center justify-center text-[#73BA27] mb-2 shadow-[0_2px_8px_rgba(115,186,39,0.05)]">
+                  <Brush className="w-4.5 h-4.5" />
                 </div>
-                <span className="font-jost text-xs font-bold text-gray-800 tracking-wide uppercase">Luxury Designs</span>
+                <span className="font-jost text-[0.70rem] md:text-[0.75rem] font-bold text-gray-800 tracking-tight leading-none uppercase">Luxury Designs</span>
               </div>
 
-              <div className="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-gray-100 flex flex-col items-center text-center shadow-[0_4px_12px_rgba(0,0,0,0.02)] hover:scale-105 transition-all">
-                <div className="w-10 h-10 rounded-full bg-[#0172CE]/10 flex items-center justify-center text-[#0172CE] mb-2">
-                  <UserCheck className="w-5 h-5" />
+              <div className="flex flex-col items-center text-center px-1">
+                <div className="w-9 h-9 rounded-full bg-[#0172CE]/8 flex items-center justify-center text-[#0172CE] mb-2 shadow-[0_2px_8px_rgba(1,114,206,0.05)]">
+                  <UserCheck className="w-4.5 h-4.5" />
                 </div>
-                <span className="font-jost text-xs font-bold text-gray-800 tracking-wide uppercase">Reliable Support</span>
+                <span className="font-jost text-[0.70rem] md:text-[0.75rem] font-bold text-gray-800 tracking-tight leading-none uppercase">Reliable Support</span>
               </div>
 
             </div>
@@ -608,7 +518,7 @@ export default function App() {
             <div className="flex flex-col sm:flex-row gap-4">
               <button 
                 onClick={() => scrollToSection("contact")}
-                className="bg-[#73BA27] hover:bg-[#62a31f] text-white px-8 py-4 px-9 rounded-full font-jost text-[0.88rem] uppercase font-bold tracking-[0.1em] hover:shadow-lg transition-all duration-300 cursor-pointer flex items-center justify-center space-x-2.5 shadow-md"
+                className="bg-[#73BA27] hover:bg-[#62a31f] text-white px-8 py-4 px-9 rounded-full font-jost text-[0.88rem] uppercase font-bold tracking-[0.1em] hover:shadow-lg transition-all duration-300 cursor-pointer flex items-center justify-center space-x-2.5 shadow-md animate-glow"
               >
                 <Calendar className="w-4 h-4" />
                 <span>Book Free Consultation</span>
@@ -625,257 +535,24 @@ export default function App() {
 
           </div>
 
-          {/* Right Column with our State-Of-The-Art Interactive Elevator Lobby Simulator */}
-          <div className="w-full md:col-span-5 flex flex-col items-center justify-center relative min-h-[460px]">
-            
-            {/* Simulation Header */}
-            <div className="absolute top-0 bg-white/90 backdrop-blur-sm shadow-sm border border-gray-100 px-4 py-1.5 rounded-full text-center z-10 text-[0.72rem] font-bold text-gray-500 tracking-wider uppercase mb-2">
-              Interactive Lobby Simulator
+          {/* Right Column / Mobile Fallback Showcase Image Card */}
+          {/* Hidden on desktop since the majestic screen-filling curved image is rendered absolutely */}
+          <div className="w-full md:col-span-6 flex flex-col items-center justify-center relative md:hidden min-h-[380px] z-20">
+            <div className="w-full max-w-[340px] bg-white p-3 rounded-[32px] shadow-[0_20px_50px_rgba(0,0,0,0.08)] border border-gray-100 overflow-hidden relative group">
+              <div className="aspect-[4/5] w-full rounded-[24px] overflow-hidden relative">
+                <img 
+                  src={heroImg} 
+                  alt="Spectrum Luxury Elevator Cabin in Hallway"
+                  referrerPolicy="no-referrer"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-5">
+                  <span className="font-mono text-[#73BA27] text-[0.62rem] font-bold uppercase tracking-widest mb-1">Spectrum Elevators</span>
+                  <h3 className="font-jost text-white font-bold text-[1.05rem] leading-snug">Elite Engineering</h3>
+                  <p className="font-jost text-gray-300 text-[0.72rem] mt-1.5 leading-relaxed font-light">Custom luxury cabins tailored precisely to your villa, home or corporate layout.</p>
+                </div>
+              </div>
             </div>
-
-            <div className="w-full max-w-[340px] bg-white rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.08)] border border-gray-100 overflow-hidden mt-8">
-              
-              {/* Marble header arch representing luxury entrance */}
-              <div className="bg-gradient-to-b from-[#FAF9F5] to-white p-4 border-b border-gray-100 text-center relative">
-                
-                {/* Glowing digital counter panel showing 6 ▲ or G ▼ */}
-                <div className="inline-flex items-center space-x-2 bg-black px-4 py-1.5 rounded-md text-red-500 font-mono text-lg font-bold border-2 border-gray-800 glow-blue">
-                  <span className="text-[#0172CE] animate-pulse">
-                    {displayFloor === "B1" ? "B1" : displayFloor === "G" ? "G" : `${displayFloor}`}
-                  </span>
-                  <span className={`text-[0.75rem] ${isMoving ? 'animate-bounce text-[#73BA27]' : 'text-[#73BA27]'}`}>
-                    {movingDirection === "up" ? "▲" : movingDirection === "down" ? "▼" : "•"}
-                  </span>
-                </div>
-
-                <div className="text-[0.58rem] font-bold tracking-widest text-[#73BA27] uppercase mt-2">
-                  LOBBY LEVEL SELECTION ACTIVE
-                </div>
-              </div>
-
-              {/* Lobby Interior preview with sliding dynamic doors */}
-              <div className="h-68 bg-[#151922] relative overflow-hidden flex items-center justify-center border-b border-gray-100">
-                
-                {/* Back of the elevator shaft: Custom interior image gradient representation */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${floorInteriors[currentFloor]?.gradient || "from-amber-100 to-amber-300"} transition-all duration-700 flex flex-col items-center justify-center p-4 text-center overflow-hidden`}>
-                  
-                  {/* Subtle depth details inside the cabin */}
-                  <div className="absolute inset-x-2 top-2 h-[2px] bg-white/40" />
-                  <div className="absolute inset-[15%] border border-white/20 rounded-md" />
-                  <div className="absolute top-6 w-10 h-14 bg-white/20 backdrop-blur-[2px] rounded border border-white/30" /> {/* Cabin mirror */}
-                  
-                  <div className="relative z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]">
-                    <div className="w-7 h-7 rounded-full bg-white/90 flex items-center justify-center text-gray-900 font-bold text-xs mx-auto mb-1 shadow-sm">
-                      {currentFloor}
-                    </div>
-                    <div className="font-jost text-[0.62rem] font-black text-gray-900 uppercase tracking-widest leading-none">
-                      {floorInteriors[currentFloor]?.title.split(" ").slice(0, 2).join(" ")}
-                    </div>
-                    <div className="font-jost text-[0.5rem] font-medium text-gray-800 max-w-[120px] mx-auto mt-1 leading-normal opacity-90 hidden sm:block">
-                      {floorInteriors[currentFloor]?.style}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Left Sliding Door */}
-                <div 
-                  className="absolute left-0 top-0 bottom-0 w-1/2 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-400 border-r border-[#B8966E]/40 transition-transform duration-1000 ease-in-out z-20 shadow-[5px_0_15px_rgba(0,0,0,0.15)]"
-                  style={{
-                    transform: doorState === "open" ? "translateX(-92%)" : doorState === "opening" ? "translateX(-92%)" : doorState === "closing" ? "translateX(-15%)" : "translateX(0%)"
-                  }}
-                >
-                  {/* Door vertical grooves */}
-                  <div className="absolute right-4 top-0 bottom-0 w-[1px] bg-slate-300" />
-                  <div className="absolute right-8 top-0 bottom-0 w-[1px] bg-slate-300" />
-                </div>
-
-                {/* Right Sliding Door */}
-                <div 
-                  className="absolute right-0 top-0 bottom-0 w-1/2 bg-gradient-to-l from-gray-200 via-gray-300 to-gray-400 border-l border-[#B8966E]/40 transition-transform duration-1000 ease-in-out z-20 shadow-[-5px_0_15px_rgba(0,0,0,0.15)]"
-                  style={{
-                    transform: doorState === "open" ? "translateX(92%)" : doorState === "opening" ? "translateX(92%)" : doorState === "closing" ? "translateX(15%)" : "translateX(0%)"
-                  }}
-                >
-                  {/* Door vertical grooves */}
-                  <div className="absolute left-4 top-0 bottom-0 w-[1px] bg-slate-300" />
-                  <div className="absolute left-8 top-0 bottom-0 w-[1px] bg-slate-300" />
-                </div>
-
-                {/* Floor arrival ding alert visual */}
-                {doorState === "opening" && (
-                  <div className="absolute inset-0 z-30 bg-[#73BA27]/10 flex items-center justify-center animate-pulse pointer-events-none">
-                    <div className="font-jost text-xs text-[#73BA27] font-bold bg-white/95 px-3 py-1 rounded-full shadow-md tracking-widest uppercase">
-                      🛎️ Floor Reached!
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Physical Floor Controller panel at the bottom of the card */}
-              <div className="p-4 bg-gray-50 flex flex-col justify-center">
-                <div className="text-[0.62rem] font-bold tracking-widest text-[#0172CE] uppercase mb-2 text-center">
-                  Select Target Floor
-                </div>
-                
-                {/* Responsive grid of floor key buttons */}
-                <div className="grid grid-cols-4 gap-2">
-                  {floors.map((fl) => {
-                    const isActive = targetFloor === fl;
-                    const isPassed = currentFloor === fl;
-                    
-                    return (
-                      <button
-                        key={fl}
-                        disabled={isMoving}
-                        onClick={() => handleElevatorCall(fl)}
-                        className={`py-2 rounded-lg font-mono text-sm font-semibold transition-all shadow-sm ${
-                          isActive 
-                            ? "bg-[#73BA27] text-white font-extrabold ring-2 ring-emerald-300 scale-95" 
-                            : isPassed 
-                            ? "bg-[#0172CE]/10 text-[#0172CE] border border-[#0172CE]/20" 
-                            : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200 active:scale-90"
-                        } ${isMoving ? "opacity-70 cursor-not-allowed" : "cursor-pointer"}`}
-                      >
-                        {fl}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {/* Live Status indicator */}
-                <div className="mt-3 text-center">
-                  <span className="font-mono text-[0.6rem] text-gray-500 uppercase tracking-wide">
-                    {isMoving ? (
-                      <span className="text-[#0172CE] animate-pulse">
-                        In Transit: Going to Floor {targetFloor}...
-                      </span>
-                    ) : (
-                      <span>Currently parked at Floor {currentFloor}</span>
-                    )}
-                  </span>
-                </div>
-
-              </div>
-
-            </div>
-
-            {/* FLOATING SAFETY CERTIFIED BADGE */}
-            <motion.div 
-              className="absolute -bottom-8 -left-2 md:-left-12 z-30 bg-white/95 backdrop-blur-md shadow-[0_12px_36px_rgba(0,0,0,0.12)] border-[1.5px] border-[#73BA27]/30 p-3.5 rounded-2xl flex items-center space-x-3 cursor-pointer select-none max-w-[240px]"
-              animate={{ 
-                y: [0, -8, 0],
-              }}
-              transition={{ 
-                duration: 5, 
-                repeat: Infinity, 
-                ease: "easeInOut" 
-              }}
-              whileHover={{ scale: 1.05, y: -2 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => setShowSafetyDetails(!showSafetyDetails)}
-            >
-              <div className="relative">
-                <div className="w-10 h-10 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-[#73BA27]">
-                  <ShieldCheck className="w-5.5 h-5.5" />
-                </div>
-                {/* Ripple Circle Animation */}
-                <span className="absolute inset-0 rounded-full border border-[#73BA27] animate-ping opacity-35 pointer-events-none"></span>
-              </div>
-              
-              <div>
-                <div className="font-jost text-[0.68rem] font-black text-[#73BA27] tracking-[0.14em] uppercase flex items-center gap-1.5 leading-none">
-                  <span>SAFETY CERTIFIED</span>
-                  <span className="w-1.5 h-1.5 bg-[#73BA27] rounded-full animate-pulse"></span>
-                </div>
-                <div className="font-jost text-[0.62rem] text-gray-500 font-semibold leading-tight tracking-wide mt-1">
-                  100% Safety Standards Verified
-                </div>
-                <div className="font-mono text-[0.52rem] text-[#0172CE] font-bold uppercase tracking-wider mt-1 flex items-center">
-                  <span>TAP TO VERIFY</span>
-                  <ChevronRight className="w-2.5 h-2.5 ml-0.5" />
-                </div>
-              </div>
-            </motion.div>
-
-            {/* SAFETY DETAILS MODAL OVERLAY */}
-            <AnimatePresence>
-              {showSafetyDetails && (
-                <motion.div 
-                  initial={{ opacity: 0, scale: 0.95, y: 15 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95, y: 15 }}
-                  className="absolute bottom-16 left-1/2 -translate-x-1/2 w-[90%] sm:w-[325px] bg-[#151922] text-white p-5 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,0.35)] border border-[#73BA27]/40 z-40 backdrop-blur-xl"
-                >
-                  <div className="flex justify-between items-start mb-3 border-b border-gray-800 pb-2.5">
-                    <div className="flex items-center space-x-2">
-                      <div className="w-7 h-7 rounded-full bg-[#73BA27]/15 flex items-center justify-center text-[#73BA27]">
-                        <ShieldCheck className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <h4 className="font-jost text-[0.72rem] font-black tracking-wider uppercase text-white">
-                          SAFETY VERIFICATION
-                        </h4>
-                        <p className="font-mono text-[0.52rem] text-gray-400 font-semibold uppercase">
-                          SPECTRUM STANDARDS
-                        </p>
-                      </div>
-                    </div>
-                    <button 
-                      onClick={() => setShowSafetyDetails(false)}
-                      className="text-gray-400 hover:text-white transition-colors p-1"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                  
-                  <div className="space-y-2 mb-4">
-                    <div className="flex items-start space-x-2 text-[0.72rem]">
-                      <Check className="w-3.5 h-3.5 text-[#73BA27] mt-0.5 shrink-0" />
-                      <div>
-                        <span className="font-bold text-gray-200">ISO 9001:2015 QA Certified</span>
-                        <p className="font-mono text-[0.58rem] text-gray-400">Strict manufacturing execution system & quality control.</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start space-x-2 text-[0.72rem]">
-                      <Check className="w-3.5 h-3.5 text-[#73BA27] mt-0.5 shrink-0" />
-                      <div>
-                        <span className="font-bold text-gray-200">Emergency ARD Integration</span>
-                        <p className="font-mono text-[0.58rem] text-gray-400">Automatic rescue device guarantees floor landing on outage.</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start space-x-2 text-[0.72rem]">
-                      <Check className="w-3.5 h-3.5 text-[#73BA27] mt-0.5 shrink-0" />
-                      <div>
-                        <span className="font-bold text-gray-200">IS 14665 Compliant Controls</span>
-                        <p className="font-mono text-[0.58rem] text-gray-400">Rigorous national safety override config.</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start space-x-2 text-[0.72rem]">
-                      <Check className="w-3.5 h-3.5 text-[#73BA27] mt-0.5 shrink-0" />
-                      <div>
-                        <span className="font-bold text-gray-200">Overspeed Governor catch</span>
-                        <p className="font-mono text-[0.58rem] text-gray-400">Mechanical catches instantly lock cab in free-fall speed events.</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start space-x-2 text-[0.72rem]">
-                      <Check className="w-3.5 h-3.5 text-[#73BA27] mt-0.5 shrink-0" />
-                      <div>
-                        <span className="font-bold text-gray-200">Full Height Curtain Sensors</span>
-                        <p className="font-mono text-[0.58rem] text-gray-400">Non-contact multi-beam infrared light curtain system.</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <button 
-                    onClick={() => setShowSafetyDetails(false)}
-                    className="w-full bg-[#73BA27] hover:bg-[#62a31f] text-white py-2 rounded-xl text-center font-jost text-[0.72rem] font-bold tracking-[0.10em] uppercase transition-colors cursor-pointer"
-                  >
-                    Got It, Verified ✓
-                  </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
           </div>
 
         </div>
@@ -1294,7 +971,7 @@ export default function App() {
                       key={activeProductIndex}
                       src={
                         activeProductIndex === 0 ? luxuryVillaElevator :
-                        activeProductIndex === 1 ? smartElevatorTech :
+                        activeProductIndex === 1 ? heroImg :
                         activeProductIndex === 2 ? "https://picsum.photos/seed/office-elevator/600/450" :
                         activeProductIndex === 3 ? "https://picsum.photos/seed/industrial-elevator/600/450" :
                         "https://picsum.photos/seed/freight-lift/600/400"
