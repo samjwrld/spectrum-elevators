@@ -38,7 +38,7 @@ import { motion, AnimatePresence } from "motion/react";
 
 // Generated visual elements for brand elevation
 import luxuryVillaElevator from "./assets/images/luxury_villa_elevator_1780118810684.png";
-import heroImg from "./assets/images/luxury_hero_lobby_1780153539610.png";
+import heroImg from "./assets/images/h1.png";
 import heroMobileImg from "./assets/images/hero.png";
 import commercialElevator from "./assets/images/commercial_elevator_cabin_1780211992973.png";
 import logoImg from "./assets/images/logo.png";
