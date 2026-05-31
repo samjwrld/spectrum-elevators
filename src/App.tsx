@@ -1091,11 +1091,11 @@ export default function App() {
                       RISK MANAGEMENT WARNING
                     </span>
                     <div className="font-jost space-y-1">
-                      <div className="text-[1.2rem] font-black text-red-600 block">
-                        Cheap Elevator? ❌
+                      <div className="text-[1.2rem] font-black text-gray-900 block">
+                        Cheap Elevator? <span className="inline-block" style={{ color: 'initial' }}>❌</span>
                       </div>
-                      <div className="text-[1.2rem] font-black text-emerald-600 block">
-                        Costly Risk ✅
+                      <div className="text-[1.2rem] font-black text-gray-900 block">
+                        Costly Risk <span className="inline-block" style={{ color: 'initial' }}>✅</span>
                       </div>
                     </div>
                   </div>
@@ -1104,7 +1104,7 @@ export default function App() {
                       className="inline-block text-white rounded-full px-5 py-2 font-jost text-[0.75rem] font-black uppercase tracking-wider animate-pulse select-none text-center"
                       style={{ backgroundColor: '#03b1fd' }}
                     >
-                      So, Avoid Risks
+                      Avoid Risks
                     </div>
                   </div>
                 </div>
