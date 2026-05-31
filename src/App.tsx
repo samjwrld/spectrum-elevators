@@ -38,8 +38,9 @@ import { motion, AnimatePresence } from "motion/react";
 
 // Generated visual elements for brand elevation
 import luxuryVillaElevator from "./assets/images/luxury_villa_elevator_1780118810684.png";
-import heroImg from "./assets/images/h1.png";
+import heroImg from "./assets/images/lobby_elevators_hero_1780219218300.png";
 import heroMobileImg from "./assets/images/hero.png";
+import passengerElevator from "./assets/images/passenger_elevator_cabin_1780219236694.png";
 import commercialElevator from "./assets/images/commercial_elevator_cabin_1780211992973.png";
 import logoImg from "./assets/images/logo.png";
 
@@ -587,7 +588,6 @@ export default function App() {
         </div>
       </div>
 
-
       {/* SECTION 3 — DOUBLE OPPOSITE MARQUEE STRIPS */}
       <div className="py-2.5 bg-[#F9F9FB] border-t border-b border-gray-200/50 flex flex-col space-y-1 overflow-hidden select-none mt-12">
         
@@ -946,7 +946,7 @@ export default function App() {
                       key={activeProductIndex}
                       src={
                         activeProductIndex === 0 ? luxuryVillaElevator :
-                        activeProductIndex === 1 ? heroImg :
+                        activeProductIndex === 1 ? passengerElevator :
                         commercialElevator
                       }
                       alt={elevatorTypes[activeProductIndex].name}
