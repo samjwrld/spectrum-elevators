@@ -1085,17 +1085,27 @@ export default function App() {
               
               <div>
                 {/* Visual Risk Indicator Banner */}
-                <div className="mb-8 border border-red-100 bg-red-50/50 p-4 rounded-2xl flex items-center justify-between gap-4">
+                <div className="mb-8 border border-red-100 bg-red-50/50 p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <div>
-                    <span className="font-jost text-[0.62rem] font-bold uppercase tracking-widest text-red-500 block">
+                    <span className="font-jost text-[0.62rem] font-bold uppercase tracking-widest text-red-500 block mb-2">
                       RISK MANAGEMENT WARNING
                     </span>
-                    <h4 className="font-jost text-[1.12rem] font-black text-gray-900 mt-1">
-                      Cheap Elevator? <span className="text-red-500 font-bold">❌ Costly Risk.</span>
-                    </h4>
+                    <div className="font-jost space-y-1">
+                      <div className="text-[1.2rem] font-black text-red-600 block">
+                        Cheap Elevator? ❌
+                      </div>
+                      <div className="text-[1.2rem] font-black text-emerald-600 block">
+                        Costly Risk ✅
+                      </div>
+                    </div>
                   </div>
-                  <div className="bg-red-500 text-white rounded-full px-4 py-1.5 font-jost text-[0.68rem] font-black uppercase tracking-wider animate-pulse select-none">
-                    Avoid Risks
+                  <div className="shrink-0">
+                    <div 
+                      className="inline-block text-white rounded-full px-5 py-2 font-jost text-[0.75rem] font-black uppercase tracking-wider animate-pulse select-none text-center"
+                      style={{ backgroundColor: '#03b1fd' }}
+                    >
+                      So, Avoid Risks
+                    </div>
                   </div>
                 </div>
 
@@ -1727,7 +1737,7 @@ export default function App() {
 
       {/* SECTION 9 — FOOTER */}
       <footer className="bg-gray-50 border-t border-gray-200/60 pt-20">
-        <div className="max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 pb-16">
+        <div className="max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-12 pb-16">
           
           {/* Column 1 */}
           <div>
@@ -1795,10 +1805,32 @@ export default function App() {
             <h5 className="font-jost text-[0.82rem] uppercase tracking-wider text-gray-900 font-bold mb-4">
               Branch Offices
             </h5>
-            <ul className="space-y-2 font-jost text-[0.82rem] text-gray-500 font-medium">
+            <ul className="space-y-2 font-jost text-[0.82rem] text-gray-500 font-medium mb-5">
               <li>Hyderabad HQ (Banjara Hills)</li>
               <li>Nanded Office</li>
               <li>Mumbai Branch (Dombivli W)</li>
+              <li>Hosur Attibele</li>
+            </ul>
+
+            <h5 className="font-jost text-[0.82rem] uppercase tracking-wider text-gray-900 font-bold mb-2">
+              Manufacturing Unit
+            </h5>
+            <ul className="space-y-2 font-jost text-[0.82rem] text-gray-500 font-medium">
+              <li>Chennai</li>
+            </ul>
+          </div>
+
+          {/* Column 5 */}
+          <div>
+            <h5 className="font-jost text-[0.82rem] uppercase tracking-wider text-gray-900 font-bold mb-4">
+              Operational States
+            </h5>
+            <ul className="space-y-2 font-jost text-[0.82rem] text-gray-500 font-medium">
+              <li>Telangana</li>
+              <li>Maharastra</li>
+              <li>Karnataka</li>
+              <li>Andhra Pradesh</li>
+              <li>Tamil Nadu</li>
             </ul>
           </div>
 
