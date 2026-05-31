@@ -39,6 +39,8 @@ import { motion, AnimatePresence } from "motion/react";
 // Generated visual elements for brand elevation
 import luxuryVillaElevator from "./assets/images/luxury_villa_elevator_1780118810684.png";
 import heroImg from "./assets/images/luxury_hero_lobby_1780153539610.png";
+import heroMobileImg from "./assets/images/hero.png";
+import commercialElevator from "./assets/images/commercial_elevator_cabin_1780211992973.png";
 import logoImg from "./assets/images/logo.png";
 
 
@@ -47,7 +49,7 @@ export function SpectrumLogo({ className = "", size = "normal" }: { className?: 
   const heightClasses = {
     small: "h-9 sm:h-10",
     normal: "h-11 sm:h-12",
-    large: "h-14 sm:h-[4.25rem]",
+    large: "h-18 sm:h-[5.25rem]",
   };
 
   return (
@@ -56,7 +58,7 @@ export function SpectrumLogo({ className = "", size = "normal" }: { className?: 
         src={logoImg}
         alt="Spectrum Elevators Logo"
         referrerPolicy="no-referrer"
-        className={`${heightClasses[size]} w-auto object-contain`}
+        className={`${heightClasses[size]} w-auto object-contain mix-blend-multiply`}
       />
     </div>
   );
@@ -218,16 +220,6 @@ export default function App() {
       num: "03",
       name: "Commercial Elevators",
       desc: "High-traffic solutions for offices and retail — quick, efficient, and built for daily intensity."
-    },
-    {
-      num: "04",
-      name: "Industrial Elevators",
-      desc: "Heavy-load capability for warehouses and manufacturing, engineered for the most demanding conditions."
-    },
-    {
-      num: "05",
-      name: "Freight Elevators",
-      desc: "Robust and reliable goods transport for commercial and industrial use — smooth, efficient, built to last."
     }
   ];
 
@@ -389,12 +381,12 @@ export default function App() {
         <div className="absolute bottom-1/3 right-1/4 w-[400px] h-[400px] bg-[#0172CE]/4 rounded-full blur-[120px] pointer-events-none z-0" />
         
         {/* RIGHT SIDE HERO IMAGE (Beautiful Lobby Showcase with no gaps) */}
-        <div className="absolute inset-y-0 right-0 w-[68%] hidden md:block select-none z-0">
+        <div className="absolute inset-y-0 right-0 w-[80%] hidden md:block select-none z-0">
           <img 
             src={heroImg} 
             alt="Spectrum Luxury Elevator Cabin in Hallway"
             referrerPolicy="no-referrer"
-            className="w-full h-full object-cover" 
+            className="w-full h-full object-cover object-right" 
           />
         </div>
 
@@ -416,25 +408,25 @@ export default function App() {
 
             {/* The white/off-white background on the left, curving beautifully */}
             <path 
-              d="M 0,0 L 560,0 C 420,250 420,750 660,1000 L 0,1000 Z" 
+              d="M 0,0 L 490,0 C 350,250 350,750 600,1000 L 0,1000 Z" 
               className="fill-[#FAF9F7]" 
             />
 
             {/* The beautiful white/off-white soft fade overlay that feathers out over the hallway photo */}
             <path 
-              d="M 560,0 C 420,250 420,750 660,1000 L 1000,1000 L 1000,0 Z" 
+              d="M 490,0 C 350,250 350,750 600,1000 L 1000,1000 L 1000,0 Z" 
               fill="url(#curve-fade)"
             />
 
             {/* Precise layered transition curve styling - glowing white border mimicking the reference ribbon */}
             <path 
-              d="M 560,0 C 420,250 420,750 660,1000" 
+              d="M 490,0 C 350,250 350,750 600,1000" 
               className="fill-none stroke-white stroke-[8] opacity-90" 
             />
 
             {/* Secondary backing visual shadow-edge of the layered curve */}
             <path 
-              d="M 558,0 C 418,250 418,750 658,1000" 
+              d="M 488,0 C 348,250 348,750 598,1000" 
               className="fill-none stroke-black/5 stroke-[3]" 
             />
           </svg>
@@ -455,7 +447,7 @@ export default function App() {
             </div>
 
             {/* Stunning premium heading from the reference image */}
-            <h1 className="font-jost leading-[1.125] text-[2.2rem] sm:text-[2.8rem] lg:text-[3.2rem] xl:text-[3.4rem] font-semibold text-gray-900 tracking-tight mb-4">
+            <h1 className="font-jost leading-[1.125] text-[1.8rem] sm:text-[2.3rem] lg:text-[2.6rem] xl:text-[2.8rem] font-semibold text-gray-900 tracking-tight mb-4">
               <div className="block whitespace-nowrap">Elevate Life with</div>
               <div className="text-[#73BA27] underline decoration-gray-100 underline-offset-4 block whitespace-nowrap">Safety, Style &</div>
               <div className="text-[#0172CE] block md:whitespace-nowrap">Superior Technology</div>
@@ -526,7 +518,7 @@ export default function App() {
             <div className="w-full max-w-[340px] bg-white p-3 rounded-[32px] shadow-[0_20px_50px_rgba(0,0,0,0.08)] border border-gray-100 overflow-hidden relative group">
               <div className="aspect-[4/5] w-full rounded-[24px] overflow-hidden relative">
                 <img 
-                  src={heroImg} 
+                  src={heroMobileImg} 
                   alt="Spectrum Luxury Elevator Cabin in Hallway"
                   referrerPolicy="no-referrer"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
@@ -895,8 +887,7 @@ export default function App() {
                             <span className="text-gray-800 font-bold">{
                               idx === 0 ? "0.4 m/s (Silent)" :
                               idx === 1 ? "1.0 m/s - 1.75 m/s" :
-                              idx === 2 ? "1.5 m/s - 2.5 m/s" :
-                              idx === 3 ? "0.5 m/s - 1.0 m/s" : "0.25 m/s - 0.75 m/s"
+                              "1.5 m/s - 2.5 m/s"
                             }</span>
                           </div>
                           <div>
@@ -904,8 +895,7 @@ export default function App() {
                             <span className="text-gray-800 font-bold">{
                               idx === 0 ? "250kg - 450kg" :
                               idx === 1 ? "450kg - 1360kg" :
-                              idx === 2 ? "680kg - 1600kg" :
-                              idx === 3 ? "1000kg - 5000kg" : "1000kg - 3000kg"
+                              "680kg - 1600kg"
                             }</span>
                           </div>
                         </div>
@@ -957,9 +947,7 @@ export default function App() {
                       src={
                         activeProductIndex === 0 ? luxuryVillaElevator :
                         activeProductIndex === 1 ? heroImg :
-                        activeProductIndex === 2 ? "https://picsum.photos/seed/office-elevator/600/450" :
-                        activeProductIndex === 3 ? "https://picsum.photos/seed/industrial-elevator/600/450" :
-                        "https://picsum.photos/seed/freight-lift/600/400"
+                        commercialElevator
                       }
                       alt={elevatorTypes[activeProductIndex].name}
                       referrerPolicy="no-referrer"
@@ -995,9 +983,7 @@ export default function App() {
                       {
                         activeProductIndex === 0 ? "0.4 m/s (Super Silent Drive)" :
                         activeProductIndex === 1 ? "1.0 m/s to 1.75 m/s (High Speed)" :
-                        activeProductIndex === 2 ? "1.5 m/s to 2.5 m/s (Ultra Rapid)" :
-                        activeProductIndex === 3 ? "0.5 m/s to 1.0 m/s (Engineered)" : 
-                        "0.25 m/s to 0.75 m/s (Heavy Synchronous)"
+                        "1.5 m/s to 2.5 m/s (Ultra Rapid)"
                       }
                     </span>
                   </div>
@@ -1010,9 +996,7 @@ export default function App() {
                       {
                         activeProductIndex === 0 ? "250kg to 450kg (3 - 6 Passengers)" :
                         activeProductIndex === 1 ? "450kg to 1360kg (6 - 20 Passengers)" :
-                        activeProductIndex === 2 ? "680kg to 1600kg (9 - 24 Passengers)" :
-                        activeProductIndex === 3 ? "1000kg to 5000kg (Industrial Cargo)" : 
-                        "1000kg to 3000kg (Forklift rated)"
+                        "680kg to 1600kg (9 - 24 Passengers)"
                       }
                     </span>
                   </div>
@@ -1025,9 +1009,7 @@ export default function App() {
                       {
                         activeProductIndex === 0 ? "Low pit requirement (only 300mm), overhead headroom 2900mm. Works on clean single-phase residential 230V connection." :
                         activeProductIndex === 1 ? "VVVF speed adjustments, non-contact infrared safety columns, electronic double brake, automatic floor landing system on power cut." :
-                        activeProductIndex === 2 ? "Regenerative smart motor returns clean power to Grid, destination routing algorithm, high durability titanium hairline cabin options." :
-                        activeProductIndex === 3 ? "Heavy-gauge reinforced steel channels, steel checker floor, crash barriers, moisture and explosion resistive options available." : 
-                        "Sub-level heavy landing doors, high stability structural frame, dual VVVF coupled motor system for stable freight carriage without shifting tilt."
+                        "Regenerative smart motor returns clean power to Grid, destination routing algorithm, high durability titanium hairline cabin options."
                       }
                     </span>
                   </div>
@@ -1751,9 +1733,9 @@ export default function App() {
           <div>
             <div 
               onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} 
-              className="cursor-pointer select-none mb-4 inline-block"
+              className="cursor-pointer select-none mb-4 inline-block animate-pulse-subtle"
             >
-              <SpectrumLogo size="normal" />
+              <SpectrumLogo size="large" />
             </div>
             
             <p className="font-jost text-[0.82rem] text-gray-500 leading-[1.8] max-w-[240px]">
